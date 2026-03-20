@@ -1,0 +1,186 @@
+saborGestion/
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   │   ├── Auth/
+│   │   │   ├── DashboardController.php
+│   │   │   ├── ProductoController.php
+│   │   │   ├── InventarioController.php
+│   │   │   ├── MesaController.php
+│   │   │   ├── PedidoController.php
+│   │   │   ├── ComandaController.php
+│   │   │   ├── DeliveryController.php
+│   │   │   ├── FacturaController.php
+│   │   │   ├── PagoController.php
+│   │   │   ├── CierreCajaController.php
+│   │   │   └── UsuarioController.php
+│   │   └── Middleware/
+│   │       └── RoleMiddleware.php
+│   ├── Models/
+│   │   ├── User.php
+│   │   ├── Producto.php
+│   │   ├── Inventario.php
+│   │   ├── Mesa.php
+│   │   ├── Pedido.php
+│   │   ├── Comanda.php
+│   │   ├── Delivery.php
+│   │   ├── Factura.php
+│   │   ├── Pago.php
+│   │   └── CierreCaja.php
+│   └── Providers/
+│       └── RouteServiceProvider.php
+├── database/
+│   ├── migrations/
+│   └── seeders/
+├── resources/
+│   └── views/
+│       ├── layouts/
+│       │   ├── sidebar.blade.php
+│       │   └── app.blade.php
+│       ├── auth/
+│       │   └── login.blade.php
+│       ├── dashboard/
+│       │   ├── administrador/
+│       │   │   ├── index.blade.php
+│       │   │   └── reportes.blade.php
+│       │   ├── mesero/
+│       │   │   ├── index.blade.php
+│       │   │   └── reportes.blade.php
+│       │   ├── cocinero/
+│       │   │   ├── index.blade.php
+│       │   │   └── reportes.blade.php
+│       │   └── cajero/
+│       │       ├── index.blade.php
+│       │       └── reportes.blade.php
+│       ├── productos/
+│       │   ├── index.blade.php
+│       │   ├── create.blade.php
+│       │   ├── edit.blade.php
+│       │   └── show.blade.php
+│       ├── inventario/
+│       │   └── index.blade.php
+│       ├── mesas/
+│       │   └── index.blade.php
+│       ├── pedidos/
+│       │   └── index.blade.php
+│       ├── comandas/
+│       │   └── index.blade.php
+│       ├── delivery/
+│       │   └── index.blade.php
+│       ├── facturas/
+│       │   └── index.blade.php
+│       ├── pagos/
+│       │   └── index.blade.php
+│       ├── cierres/
+│       │   └── index.blade.php
+│       └── usuarios/
+│           ├── index.blade.php
+│           ├── create.blade.php
+│           ├── edit.blade.php
+│           └── show.blade.php
+├── routes/
+│   ├── web.php
+│   └── api.php
+└── tailwind.config.js
+
+
+
+
+
+
+
+
+=================================================================
+=================================================================
+=============================PROMT===============================
+=================================================================
+
+
+Acabo de crear mi proyecto en laravel12 C:\proyectos-laravel\saborGestion> 
+Crear una aplicación web básica con una estructura clara, escalable y mantenible, utilizando Laravel 12 y Tailwind (css si es neecsario) y phpmyadmin(nombre de base de datos: saborGestion).
+
+1. Página principal
+ Página web principal sencilla.
+ Contiene un botón de inicio de sesión.
+ Al presionar el botón, redirige a la vista de login.
+
+2. Autenticación
+ Vista de login funcional con breeze (con explicacion de comandos y pasos a utilizar para instalar breeze)
+ Manejo de 4 tipos de roles: (Administrador, Mesero, Cocinero, Cajero)
+ Después de iniciar sesión, redirige a un panel administrativo según el rol.
+
+3. Panel administrativo
+ Panel responsivo.
+ Diseño profesional, listo para agregar lógica posteriormente.
+ Contiene Sidebar (menú lateral) con las siguientes secciones:
+
+4. Sidebar (menú lateral): //CADA HOJA DEBE ESTAR CON ESPACIO PARA AGREGAR LÓGICA, El rol "Administrador" puede ver todas las secciones
+ Inteligencia de Negocios[
+   - Dashboard administrador  //Disponible para rol ="Administrador"
+   - Dashboard mesero         //Disponible para rol ="Mesero"
+   - Dashboard cocinero       //Disponible para rol ="Cocinero"
+   - Dashboard cajero         //Disponible para rol ="Cajero"
+ ]
+
+ Gestión de catálogo y menú[
+   - Gestión de Productos     //Disponible para rol ="Administrador, Cocinero"
+   - Inventario ingredientes (con un pequeño número que simule N° notificación)  //Disponible para rol ="Administrador, Cocinero"
+   - Gestión de Mesas         //Disponible para rol ="Administrador, Mesero"
+ ]
+
+Módulo de Atención y Pedidos[
+ - Toma de pedidos            //Disponible para rol ="Administrador, Cajero"
+ - Gestión de comanda         //Disponible para rol ="Administrador, Cajero"
+ - Atención Delivery          //Disponible para rol ="Administrador, Cajero"
+]
+
+Facturación y Cierre[
+  - Generación de Pre-factura  //Disponible para rol ="Administrador, Cajero"
+  - Registro de Pagos          //Disponible para rol ="Administrador, Cajero"
+  - Cierre de Caja             //Disponible para rol ="Administrador, Cajero"
+]
+- Usuarios                     //Solo disponible para administrador, incluir funcionalidad y CRUD de usuarios
+
+Las vistas deben estar organizadas de manera ordenada y escalable:
+
+ views/layouts/sidebar.blade.php
+ views/auth/login.blade.php
+ //Incluir extras si se requieren 
+
+ views/dashboard_administrador/index.blade.php, reportes.blade.php
+ views/dashboard_mesero/index.blade.php, reportes.blade.php
+ views/dashboard_cocinero/index.blade.php, reportes.blade.php
+ views/dashboard_cajero/index.blade.php, reportes.blade.php
+
+ views/gestion_Productos/index.blade.php, edit.blade.php, etc (CRUD)
+ views/inventario_ingredientes/index.blade.php
+ views/gestion_mesas/index.blade.php
+
+ views/toma_pedidos/index.blade.php
+ views/gestion_comanda/index.blade.php
+ views/atencion_delivery/index.blade.php
+
+ views/pre_factura/index.blade.php
+ views/registro_pagos/index.blade.php
+ views/cierre_caja/index.blade.php
+
+
+5. Requisitos de diseño
+Usar colores ideales para un sistema de restaurante gastronómico (definidos como variables en Tailwind).
+Usar Font Awesome para los íconos del menú.
+
+6. Arquitectura
+Proyecto organizado siguiendo buenas prácticas de Laravel.
+Estructura pensada para ser escalable y mantenible.
+
+Separación clara entre:
+Vistas
+Layouts
+Componentes
+Rutas
+
+6. Entregables
+Mostrar la estructura de archivos y carpetas del proyecto Laravel.
+Mostrar la paleta de colores utilizadas
+También especificar como implementar el sistema en casos necesarios (comandos, uso de tinker, rutas de los archivos que fueron agregadas/modificadas etc)
+
