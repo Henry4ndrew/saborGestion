@@ -85,10 +85,29 @@ saborGestion/
 
 
 
+henry@email.com
+12345678
 
 
 
 
+
+
+=================================================================
+====================PALETA DE COLORES============================
+:root {
+  --primary: #8B4513;    /* Marrón madera - Principal */
+  --secondary: #D2691E;   /* Naranja cálido - Secundario */
+  --accent: #F4A460;      /* Melocotón - Acentos */
+  --success: #2E7D32;     /* Verde oliva - Éxito */
+  --warning: #FFA000;     /* Ámbar - Advertencia */
+  --danger: #C62828;      /* Rojo vino - Error */
+  --info: #0277BD;        /* Azul marino - Información */
+  --light: #FFF8E7;       /* Crema - Fondos claros */
+  --dark: #3E2723;        /* Café oscuro - Texto */
+}
+=================================================================
+=================================================================
 
 =================================================================
 =================================================================
