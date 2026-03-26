@@ -10,7 +10,12 @@ class DashboardController extends Controller
     public function administrador()
     {
         $this->authorizeRole('admin');
-        return view('dashboard.administrador.index');
+        
+        // Obtenemos una colección vacía para evitar el error de variable indefinida
+        // En el futuro, esto se podrá reemplazar con una consulta real a la base de datos
+        $productosDestacados = collect();
+        
+        return view('dashboard.administrador.index', compact('productosDestacados'));
     }
     
     public function mesero()
