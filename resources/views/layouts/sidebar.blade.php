@@ -1,101 +1,97 @@
 @php
     $user = Auth::user();
-    $role = $user->role;
+    $role = $user ? $user->role : null;
 @endphp
 
 <aside x-data="{ 
-    sidebarOpen: localStorage.getItem('sidebarOpen') !== 'false',
-    openSections: {
-        inteligencia: true,
-        catalogo: true,
-        mesas: true,
-        operaciones: true,
-        administracion: true
-    }
+    menuInteligencia: false,
+    menuCatalogo: false,
+    menuMesas: false,
+    menuOperaciones: false,
+    menuAdministracion: false
 }" 
-       :class="sidebarOpen ? 'w-72' : 'w-20'" 
-       class="bg-primary text-white shadow-xl transition-all duration-300 ease-in-out flex flex-col h-screen sticky top-0"
-       :style="sidebarOpen ? 'min-width: 288px' : 'min-width: 80px'">
+       x-cloak
+       :class="$store.sidebar.sidebarOpen ? 'w-72' : 'w-20'" 
+       class="sticky top-0 z-30 flex flex-col h-screen text-white transition-all duration-300 ease-in-out shadow-2xl bg-gradient-to-b from-primary to-primary/95"
+       :style="$store.sidebar.sidebarOpen ? 'min-width: 288px' : 'min-width: 80px'">
     
-    <!-- Logo compacto -->
-    <div class="p-5 border-b border-white/10 flex items-center justify-between">
+    <!-- Logo y branding -->
+    <div class="flex items-center justify-between p-5 border-b border-white/15">
         <div class="flex items-center gap-3 overflow-hidden">
-            <div class="flex-shrink-0">
-                <i class="fas fa-utensils text-2xl text-white"></i>
+            <div class="relative flex-shrink-0">
+                <div class="absolute inset-0 rounded-full bg-white/20 blur-sm"></div>
+                <i class="relative z-10 text-2xl text-white fas fa-utensils"></i>
             </div>
-            <div x-show="sidebarOpen" 
+            <div x-show="$store.sidebar.sidebarOpen" 
                  x-transition:enter="transition ease-out duration-200"
                  x-transition:enter-start="opacity-0 transform -translate-x-4"
                  x-transition:enter-end="opacity-100 transform translate-x-0"
                  class="whitespace-nowrap">
-                <h1 class="text-xl font-bold text-white">SaborGestion</h1>
-                <p class="text-xs text-white/70">Sistema de Gestión</p>
+                <h1 class="text-xl font-bold tracking-tight text-transparent bg-gradient-to-r from-white to-white/80 bg-clip-text">
+                    SaborGestion
+                </h1>
+                <p class="text-xs text-white/60 mt-0.5">Sistema de Gestión</p>
             </div>
         </div>
         
-        <!-- Botón toggle para escritorio -->
-        <button @click="sidebarOpen = !sidebarOpen; localStorage.setItem('sidebarOpen', sidebarOpen)" 
-                class="hidden lg:block p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-primary group">
-            <i x-show="sidebarOpen" 
-               class="fas fa-chevron-left text-white/70 group-hover:text-white transition-colors text-lg"
-               style="display: none"></i>
-            <i x-show="!sidebarOpen" 
-               class="fas fa-chevron-right text-white/70 group-hover:text-white transition-colors text-lg"
-               style="display: none"></i>
+        <!-- Botón toggle hamburguesa -->
+        <button @click="$store.sidebar.toggle()" 
+                class="p-2 transition-all duration-200 rounded-xl bg-white/10 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-primary/50 group">
+            <i class="text-lg transition-colors fas fa-bars text-white/70 group-hover:text-white"></i>
         </button>
     </div>
 
     <!-- Navegación principal -->
-    <nav class="flex-1 overflow-y-auto overflow-x-hidden py-6 px-3 custom-scrollbar">
-        <div class="space-y-1">
+    <nav class="flex-1 px-3 py-6 overflow-x-hidden overflow-y-auto custom-scrollbar">
+        <div class="space-y-1.5">
             
             <!-- Inteligencia de Negocios -->
             @if(in_array($role, ['admin', 'mesero', 'cocinero', 'cajero']))
-            <div x-data="{ open: $store.sidebar.openSections.inteligencia }" class="mb-1">
-                <button @click="open = !open; $store.sidebar.openSections.inteligencia = open" 
-                        class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg transition-all duration-200 hover:bg-white/10 group">
+            <div>
+                <button @click="menuInteligencia = !menuInteligencia" 
+                        class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition-all duration-200 hover:bg-white/10 group">
                     <div class="flex items-center gap-3">
-                        <i class="fas fa-chart-line text-white/80 text-lg w-5 group-hover:text-white transition-colors"></i>
-                        <span x-show="sidebarOpen" 
-                              x-transition.duration.200 
-                              class="text-sm font-medium text-white/80 group-hover:text-white whitespace-nowrap">
+                        <i class="w-5 text-lg transition-colors fas fa-chart-line text-white/70 group-hover:text-white"></i>
+                        <span x-show="$store.sidebar.sidebarOpen" 
+                              class="text-sm font-medium text-white/70 group-hover:text-white whitespace-nowrap">
                             Inteligencia de Negocios
                         </span>
                     </div>
-                    <i x-show="sidebarOpen" 
-                       :class="open ? 'fa-chevron-up' : 'fa-chevron-down'" 
-                       class="fas text-xs text-white/50 transition-transform duration-200"></i>
+                    <i x-show="$store.sidebar.sidebarOpen" 
+                       :class="menuInteligencia ? 'fa-chevron-up' : 'fa-chevron-down'" 
+                       class="text-xs transition-transform duration-200 fas text-white/40"></i>
                 </button>
                 
-                <div x-show="open" 
-                     x-collapse
-                     class="ml-10 mt-1 space-y-1">
+                <div x-show="menuInteligencia" 
+                     x-cloak
+                     x-transition.duration.200ms
+                     class="ml-11 mt-1 space-y-0.5">
                     @if($role == 'admin')
                         <a href="{{ route('dashboard.administrador') }}" 
-                           class="flex items-center gap-3 px-4 py-2 text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                            <i class="fas fa-chart-pie text-xs w-4"></i>
-                            <span x-show="sidebarOpen" class="whitespace-nowrap">Dashboard Admin</span>
+                           class="flex items-center gap-3 px-4 py-2 text-sm transition-all duration-200 rounded-lg text-white/60 hover:bg-white/10 hover:text-white group">
+                            <i class="w-4 text-xs fas fa-chart-pie text-white/50 group-hover:text-white/80"></i>
+                            <span x-show="$store.sidebar.sidebarOpen" class="whitespace-nowrap">Dashboard Admin</span>
                         </a>
                     @endif
                     @if($role == 'mesero')
                         <a href="{{ route('dashboard.mesero') }}" 
-                           class="flex items-center gap-3 px-4 py-2 text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                            <i class="fas fa-chart-simple text-xs w-4"></i>
-                            <span x-show="sidebarOpen" class="whitespace-nowrap">Dashboard Mesero</span>
+                           class="flex items-center gap-3 px-4 py-2 text-sm transition-all duration-200 rounded-lg text-white/60 hover:bg-white/10 hover:text-white group">
+                            <i class="w-4 text-xs fas fa-chart-simple text-white/50 group-hover:text-white/80"></i>
+                            <span x-show="$store.sidebar.sidebarOpen" class="whitespace-nowrap">Dashboard Mesero</span>
                         </a>
                     @endif
                     @if($role == 'cocinero')
                         <a href="{{ route('dashboard.cocinero') }}" 
-                           class="flex items-center gap-3 px-4 py-2 text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                            <i class="fas fa-chart-line text-xs w-4"></i>
-                            <span x-show="sidebarOpen" class="whitespace-nowrap">Dashboard Cocinero</span>
+                           class="flex items-center gap-3 px-4 py-2 text-sm transition-all duration-200 rounded-lg text-white/60 hover:bg-white/10 hover:text-white group">
+                            <i class="w-4 text-xs fas fa-chart-line text-white/50 group-hover:text-white/80"></i>
+                            <span x-show="$store.sidebar.sidebarOpen" class="whitespace-nowrap">Dashboard Cocinero</span>
                         </a>
                     @endif
                     @if($role == 'cajero')
                         <a href="{{ route('dashboard.cajero') }}" 
-                           class="flex items-center gap-3 px-4 py-2 text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                            <i class="fas fa-chart-bar text-xs w-4"></i>
-                            <span x-show="sidebarOpen" class="whitespace-nowrap">Dashboard Cajero</span>
+                           class="flex items-center gap-3 px-4 py-2 text-sm transition-all duration-200 rounded-lg text-white/60 hover:bg-white/10 hover:text-white group">
+                            <i class="w-4 text-xs fas fa-chart-bar text-white/50 group-hover:text-white/80"></i>
+                            <span x-show="$store.sidebar.sidebarOpen" class="whitespace-nowrap">Dashboard Cajero</span>
                         </a>
                     @endif
                 </div>
@@ -104,35 +100,35 @@
 
             <!-- Catálogo y Menú -->
             @if(in_array($role, ['admin', 'cocinero']))
-            <div x-data="{ open: $store.sidebar.openSections.catalogo }" class="mb-1">
-                <button @click="open = !open; $store.sidebar.openSections.catalogo = open" 
-                        class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg transition-all duration-200 hover:bg-white/10 group">
+            <div>
+                <button @click="menuCatalogo = !menuCatalogo" 
+                        class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition-all duration-200 hover:bg-white/10 group">
                     <div class="flex items-center gap-3">
-                        <i class="fas fa-book-open text-white/80 text-lg w-5 group-hover:text-white transition-colors"></i>
-                        <span x-show="sidebarOpen" 
-                              x-transition.duration.200 
-                              class="text-sm font-medium text-white/80 group-hover:text-white whitespace-nowrap">
+                        <i class="w-5 text-lg transition-colors fas fa-book-open text-white/70 group-hover:text-white"></i>
+                        <span x-show="$store.sidebar.sidebarOpen" 
+                              class="text-sm font-medium text-white/70 group-hover:text-white whitespace-nowrap">
                             Catálogo y Menú
                         </span>
                     </div>
-                    <i x-show="sidebarOpen" 
-                       :class="open ? 'fa-chevron-up' : 'fa-chevron-down'" 
-                       class="fas text-xs text-white/50 transition-transform duration-200"></i>
+                    <i x-show="$store.sidebar.sidebarOpen" 
+                       :class="menuCatalogo ? 'fa-chevron-up' : 'fa-chevron-down'" 
+                       class="text-xs transition-transform duration-200 fas text-white/40"></i>
                 </button>
                 
-                <div x-show="open" 
-                     x-collapse
-                     class="ml-10 mt-1 space-y-1">
+                <div x-show="menuCatalogo" 
+                     x-cloak
+                     x-transition.duration.200ms
+                     class="ml-11 mt-1 space-y-0.5">
                     <a href="{{ route('productos.index') }}" 
-                       class="flex items-center gap-3 px-4 py-2 text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                        <i class="fas fa-hamburger text-xs w-4"></i>
-                        <span x-show="sidebarOpen" class="whitespace-nowrap">Productos</span>
+                       class="flex items-center gap-3 px-4 py-2 text-sm transition-all duration-200 rounded-lg text-white/60 hover:bg-white/10 hover:text-white group">
+                        <i class="w-4 text-xs fas fa-hamburger text-white/50 group-hover:text-white/80"></i>
+                        <span x-show="$store.sidebar.sidebarOpen" class="whitespace-nowrap">Productos</span>
                     </a>
-                    <a style="display:none" href="{{ route('inventario.index') }}" 
-                       class="flex items-center justify-between px-4 py-2 text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
+                    <a href="{{ route('inventario.index') }}" 
+                       class="flex items-center justify-between px-4 py-2 text-sm transition-all duration-200 rounded-lg text-white/60 hover:bg-white/10 hover:text-white group">
                         <div class="flex items-center gap-3">
-                            <i class="fas fa-boxes text-xs w-4"></i>
-                            <span x-show="sidebarOpen" class="whitespace-nowrap">Inventario</span>
+                            <i class="w-4 text-xs fas fa-boxes text-white/50 group-hover:text-white/80"></i>
+                            <span x-show="$store.sidebar.sidebarOpen" class="whitespace-nowrap">Inventario</span>
                         </div>
                         @php
                             try {
@@ -142,8 +138,8 @@
                             }
                         @endphp
                         @if($stockBajo > 0)
-                            <span x-show="sidebarOpen" 
-                                  class="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full animate-pulse">
+                            <span x-show="$store.sidebar.sidebarOpen" 
+                                  class="px-2 py-1 text-xs font-bold text-white rounded-full bg-red-500/90">
                                 {{ $stockBajo }}
                             </span>
                         @endif
@@ -154,87 +150,87 @@
 
             <!-- Mesas -->
             @if(in_array($role, ['admin', 'mesero']))
-            <div x-data="{ open: $store.sidebar.openSections.mesas }" class="mb-1">
-                <button @click="open = !open; $store.sidebar.openSections.mesas = open" 
-                        class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg transition-all duration-200 hover:bg-white/10 group">
+            <div>
+                <button @click="menuMesas = !menuMesas" 
+                        class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition-all duration-200 hover:bg-white/10 group">
                     <div class="flex items-center gap-3">
-                        <i class="fas fa-chair text-white/80 text-lg w-5 group-hover:text-white transition-colors"></i>
-                        <span x-show="sidebarOpen" 
-                              x-transition.duration.200 
-                              class="text-sm font-medium text-white/80 group-hover:text-white whitespace-nowrap">
+                        <i class="w-5 text-lg transition-colors fas fa-chair text-white/70 group-hover:text-white"></i>
+                        <span x-show="$store.sidebar.sidebarOpen" 
+                              class="text-sm font-medium text-white/70 group-hover:text-white whitespace-nowrap">
                             Gestión de Mesas
                         </span>
                     </div>
-                    <i x-show="sidebarOpen" 
-                       :class="open ? 'fa-chevron-up' : 'fa-chevron-down'" 
-                       class="fas text-xs text-white/50 transition-transform duration-200"></i>
+                    <i x-show="$store.sidebar.sidebarOpen" 
+                       :class="menuMesas ? 'fa-chevron-up' : 'fa-chevron-down'" 
+                       class="text-xs transition-transform duration-200 fas text-white/40"></i>
                 </button>
                 
-                <div x-show="open" 
-                     x-collapse
-                     class="ml-10 mt-1">
+                <div x-show="menuMesas" 
+                     x-cloak
+                     x-transition.duration.200ms
+                     class="mt-1 ml-11">
                     <a href="{{ route('mesas.index') }}" 
-                       class="flex items-center gap-3 px-4 py-2 text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                        <i class="fas fa-table text-xs w-4"></i>
-                        <span x-show="sidebarOpen" class="whitespace-nowrap">Mesas</span>
+                       class="flex items-center gap-3 px-4 py-2 text-sm transition-all duration-200 rounded-lg text-white/60 hover:bg-white/10 hover:text-white group">
+                        <i class="w-4 text-xs fas fa-table text-white/50 group-hover:text-white/80"></i>
+                        <span x-show="$store.sidebar.sidebarOpen" class="whitespace-nowrap">Mesas</span>
                     </a>
                 </div>
             </div>
             @endif
 
-            <!-- Operaciones (Pedidos + Facturación) -->
+            <!-- Operaciones -->
             @if(in_array($role, ['admin', 'cajero']))
-            <div x-data="{ open: $store.sidebar.openSections.operaciones }" class="mb-1">
-                <button @click="open = !open; $store.sidebar.openSections.operaciones = open" 
-                        class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg transition-all duration-200 hover:bg-white/10 group">
+            <div>
+                <button @click="menuOperaciones = !menuOperaciones" 
+                        class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition-all duration-200 hover:bg-white/10 group">
                     <div class="flex items-center gap-3">
-                        <i class="fas fa-cash-register text-white/80 text-lg w-5 group-hover:text-white transition-colors"></i>
-                        <span x-show="sidebarOpen" 
-                              x-transition.duration.200 
-                              class="text-sm font-medium text-white/80 group-hover:text-white whitespace-nowrap">
+                        <i class="w-5 text-lg transition-colors fas fa-cash-register text-white/70 group-hover:text-white"></i>
+                        <span x-show="$store.sidebar.sidebarOpen" 
+                              class="text-sm font-medium text-white/70 group-hover:text-white whitespace-nowrap">
                             Operaciones
                         </span>
                     </div>
-                    <i x-show="sidebarOpen" 
-                       :class="open ? 'fa-chevron-up' : 'fa-chevron-down'" 
-                       class="fas text-xs text-white/50 transition-transform duration-200"></i>
+                    <i x-show="$store.sidebar.sidebarOpen" 
+                       :class="menuOperaciones ? 'fa-chevron-up' : 'fa-chevron-down'" 
+                       class="text-xs transition-transform duration-200 fas text-white/40"></i>
                 </button>
                 
-                <div x-show="open" 
-                     x-collapse
-                     class="ml-10 mt-1 space-y-1">
+                <div x-show="menuOperaciones" 
+                     x-cloak
+                     x-transition.duration.200ms
+                     class="ml-11 mt-1 space-y-0.5">
                     <a href="{{ route('pedidos.index') }}" 
-                       class="flex items-center gap-3 px-4 py-2 text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                        <i class="fas fa-clipboard-list text-xs w-4"></i>
-                        <span x-show="sidebarOpen" class="whitespace-nowrap">Pedidos</span>
+                       class="flex items-center gap-3 px-4 py-2 text-sm transition-all duration-200 rounded-lg text-white/60 hover:bg-white/10 hover:text-white group">
+                        <i class="w-4 text-xs fas fa-clipboard-list text-white/50 group-hover:text-white/80"></i>
+                        <span x-show="$store.sidebar.sidebarOpen" class="whitespace-nowrap">Pedidos</span>
                     </a>
                     <a href="{{ route('comandas.index') }}" 
-                       class="flex items-center gap-3 px-4 py-2 text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                        <i class="fas fa-receipt text-xs w-4"></i>
-                        <span x-show="sidebarOpen" class="whitespace-nowrap">Comandas</span>
+                       class="flex items-center gap-3 px-4 py-2 text-sm transition-all duration-200 rounded-lg text-white/60 hover:bg-white/10 hover:text-white group">
+                        <i class="w-4 text-xs fas fa-receipt text-white/50 group-hover:text-white/80"></i>
+                        <span x-show="$store.sidebar.sidebarOpen" class="whitespace-nowrap">Comandas</span>
                     </a>
                     <a href="{{ route('delivery.index') }}" 
-                       class="flex items-center gap-3 px-4 py-2 text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                        <i class="fas fa-motorcycle text-xs w-4"></i>
-                        <span x-show="sidebarOpen" class="whitespace-nowrap">Delivery</span>
+                       class="flex items-center gap-3 px-4 py-2 text-sm transition-all duration-200 rounded-lg text-white/60 hover:bg-white/10 hover:text-white group">
+                        <i class="w-4 text-xs fas fa-motorcycle text-white/50 group-hover:text-white/80"></i>
+                        <span x-show="$store.sidebar.sidebarOpen" class="whitespace-nowrap">Delivery</span>
                     </a>
                     
-                    <div class="h-px bg-white/10 my-2"></div>
+                    <div class="h-px my-2 bg-white/10"></div>
                     
                     <a href="{{ route('facturas.index') }}" 
-                       class="flex items-center gap-3 px-4 py-2 text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                        <i class="fas fa-file-invoice text-xs w-4"></i>
-                        <span x-show="sidebarOpen" class="whitespace-nowrap">Pre-factura</span>
+                       class="flex items-center gap-3 px-4 py-2 text-sm transition-all duration-200 rounded-lg text-white/60 hover:bg-white/10 hover:text-white group">
+                        <i class="w-4 text-xs fas fa-file-invoice text-white/50 group-hover:text-white/80"></i>
+                        <span x-show="$store.sidebar.sidebarOpen" class="whitespace-nowrap">Pre-factura</span>
                     </a>
                     <a href="{{ route('pagos.index') }}" 
-                       class="flex items-center gap-3 px-4 py-2 text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                        <i class="fas fa-credit-card text-xs w-4"></i>
-                        <span x-show="sidebarOpen" class="whitespace-nowrap">Pagos</span>
+                       class="flex items-center gap-3 px-4 py-2 text-sm transition-all duration-200 rounded-lg text-white/60 hover:bg-white/10 hover:text-white group">
+                        <i class="w-4 text-xs fas fa-credit-card text-white/50 group-hover:text-white/80"></i>
+                        <span x-show="$store.sidebar.sidebarOpen" class="whitespace-nowrap">Pagos</span>
                     </a>
                     <a href="{{ route('cierres.index') }}" 
-                       class="flex items-center gap-3 px-4 py-2 text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                        <i class="fas fa-cash-register text-xs w-4"></i>
-                        <span x-show="sidebarOpen" class="whitespace-nowrap">Cierre de Caja</span>
+                       class="flex items-center gap-3 px-4 py-2 text-sm transition-all duration-200 rounded-lg text-white/60 hover:bg-white/10 hover:text-white group">
+                        <i class="w-4 text-xs fas fa-cash-register text-white/50 group-hover:text-white/80"></i>
+                        <span x-show="$store.sidebar.sidebarOpen" class="whitespace-nowrap">Cierre de Caja</span>
                     </a>
                 </div>
             </div>
@@ -242,80 +238,80 @@
 
             <!-- Administración -->
             @if($role == 'admin')
-            <div x-data="{ open: $store.sidebar.openSections.administracion }" class="mb-1">
-                <button @click="open = !open; $store.sidebar.openSections.administracion = open" 
-                        class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg transition-all duration-200 hover:bg-white/10 group">
+            <div>
+                <button @click="menuAdministracion = !menuAdministracion" 
+                        class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl transition-all duration-200 hover:bg-white/10 group">
                     <div class="flex items-center gap-3">
-                        <i class="fas fa-user-shield text-white/80 text-lg w-5 group-hover:text-white transition-colors"></i>
-                        <span x-show="sidebarOpen" 
-                              x-transition.duration.200 
-                              class="text-sm font-medium text-white/80 group-hover:text-white whitespace-nowrap">
+                        <i class="w-5 text-lg transition-colors fas fa-user-shield text-white/70 group-hover:text-white"></i>
+                        <span x-show="$store.sidebar.sidebarOpen" 
+                              class="text-sm font-medium text-white/70 group-hover:text-white whitespace-nowrap">
                             Administración
                         </span>
                     </div>
-                    <i x-show="sidebarOpen" 
-                       :class="open ? 'fa-chevron-up' : 'fa-chevron-down'" 
-                       class="fas text-xs text-white/50 transition-transform duration-200"></i>
+                    <i x-show="$store.sidebar.sidebarOpen" 
+                       :class="menuAdministracion ? 'fa-chevron-up' : 'fa-chevron-down'" 
+                       class="text-xs transition-transform duration-200 fas text-white/40"></i>
                 </button>
                 
-                <div x-show="open" 
-                     x-collapse
-                     class="ml-10 mt-1">
+                <div x-show="menuAdministracion" 
+                     x-cloak
+                     x-transition.duration.200ms
+                     class="mt-1 ml-11">
                     <a href="{{ route('usuarios.index') }}" 
-                       class="flex items-center gap-3 px-4 py-2 text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                        <i class="fas fa-users text-xs w-4"></i>
-                        <span x-show="sidebarOpen" class="whitespace-nowrap">Usuarios</span>
+                       class="flex items-center gap-3 px-4 py-2 text-sm transition-all duration-200 rounded-lg text-white/60 hover:bg-white/10 hover:text-white group">
+                        <i class="w-4 text-xs fas fa-users text-white/50 group-hover:text-white/80"></i>
+                        <span x-show="$store.sidebar.sidebarOpen" class="whitespace-nowrap">Usuarios</span>
                     </a>
                 </div>
             </div>
             @endif
 
+            <!-- Versión -->
+            <div class="pt-4 mt-4 border-t border-white/10">
+                <div x-show="$store.sidebar.sidebarOpen" class="px-4 py-2">
+                    <p class="text-xs text-white/40">v2.0.0</p>
+                </div>
+            </div>
+
         </div>
     </nav>
 </aside>
 
-<!-- Alpine.js Store para el estado del sidebar -->
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.store('sidebar', {
-            openSections: {
-                inteligencia: true,
-                catalogo: true,
-                mesas: true,
-                operaciones: true,
-                administracion: true
-            }
-        })
+        if (!Alpine.store('sidebar')) {
+            Alpine.store('sidebar', {
+                sidebarOpen: localStorage.getItem('sidebarOpen') !== 'false',
+                toggle() {
+                    this.sidebarOpen = !this.sidebarOpen;
+                    localStorage.setItem('sidebarOpen', this.sidebarOpen);
+                }
+            })
+        }
     })
 </script>
 
-<!-- Estilos adicionales mejorados -->
 <style>
+    /* Scrollbar personalizada */
     .custom-scrollbar::-webkit-scrollbar {
-        width: 5px;
+        width: 4px;
     }
     
     .custom-scrollbar::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.08);
         border-radius: 10px;
     }
     
     .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.25);
         border-radius: 10px;
     }
     
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: rgba(255, 255, 255, 0.5);
+        background: rgba(255, 255, 255, 0.4);
     }
     
-    /* Mejoras en las transiciones */
     [x-cloak] {
         display: none !important;
-    }
-    
-    /* Transición suave para el colapso */
-    .x-collapse {
-        transition: all 0.2s ease-out;
     }
 </style>

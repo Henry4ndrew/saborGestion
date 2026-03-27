@@ -21,8 +21,14 @@
             <nav class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10">
                 <div class="px-6 py-3 flex items-center justify-between">
 
-                    <!-- IZQUIERDA: Usuario -->
+                    <!-- IZQUIERDA: Usuario y Toggle -->
                     <div class="flex items-center gap-3">
+                        <!-- Botón Hamburguesa para Móvil -->
+                        <button @click="$store.sidebar.toggle()" 
+                                class="p-2 -ml-2 mr-1 transition-colors rounded-lg text-gray-500 hover:bg-gray-100 lg:hidden">
+                            <i class="fas fa-bars text-lg"></i>
+                        </button>
+
                         <div class="w-8 h-8 rounded-lg bg-primary bg-opacity-10 flex items-center justify-center">
                             <i class="fas fa-user-alt text-primary text-sm"></i>
                         </div>
@@ -76,18 +82,5 @@
             </main>
         </div>
     </div>
-    
-    <!-- Script para manejar sidebar en móvil -->
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('sidebarState', () => ({
-                sidebarOpen: localStorage.getItem('sidebarOpen') !== 'false',
-                toggleSidebar() {
-                    this.sidebarOpen = !this.sidebarOpen;
-                    localStorage.setItem('sidebarOpen', this.sidebarOpen);
-                }
-            }));
-        });
-    </script>
 </body>
 </html>
