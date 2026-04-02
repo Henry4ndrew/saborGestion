@@ -8,14 +8,14 @@ module.exports = {
   theme: {
     extend: {
         colors: {
-        primary: '#1E3A8A',   // blue-800
-        secondary: '#3B82F6', // blue-500
-        accent: '#60A5FA',    // blue-400
-        background: '#F9FAFB',// gray-50
-        surface: '#FFFFFF',   // white
-        text: '#111827',      // gray-900
-        muted: '#6B7280',     // gray-500
-        border: '#E5E7EB',    // gray-200
+          primary: '#C2410C',   // orange-700 (principal fuerte)
+          secondary: '#F97316', // orange-500 (base vibrante)
+          accent: '#FDBA74',    // orange-300 (ligero y amigable)
+          background: '#FFF7ED',// orange-50 (fondo suave)
+          surface: '#FFFFFF',   // white
+          text: '#111827',      // gray-900
+          muted: '#78716C',     // stone-500
+          border: '#FED7AA',    // orange-200
       },
       fontFamily: {
         'sans': ['Poppins', 'system-ui', 'sans-serif'],
