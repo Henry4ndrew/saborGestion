@@ -22,7 +22,7 @@
                  x-transition:enter-start="opacity-0 transform -translate-x-4"
                  x-transition:enter-end="opacity-100 transform translate-x-0"
                  class="whitespace-nowrap">
-                <h1 class="text-lg sm:text-xl font-bold text-white">SaborGestion</h1>
+                <h1 class="text-lg sm:text-xl font-bold text-white">Sabor Gestión</h1>
                 <p class="text-[10px] sm:text-xs text-white/70">Sistema de Gestión</p>
             </div>
         </div>
@@ -34,15 +34,33 @@
             
             <!-- Inteligencia de Negocios -->
             @if(in_array($role, ['admin', 'mesero', 'cocinero', 'cajero']))
-            <div x-data="{ open: true }" class="mb-1">
-                <button @click="open = !open" 
+            <div x-data="{ 
+                open: localStorage.getItem('sidebar_section_inteligencia') === 'true',
+                toggle() {
+                    if (window.innerWidth >= 1024) {
+                        this.open = !this.open;
+                        localStorage.setItem('sidebar_section_inteligencia', this.open);
+                    } else {
+                        this.open = !this.open;
+                        localStorage.setItem('sidebar_section_inteligencia', this.open);
+                    }
+                }
+            }" 
+            x-init="() => {
+                if (localStorage.getItem('sidebar_section_inteligencia') === null) {
+                    open = false;
+                    localStorage.setItem('sidebar_section_inteligencia', false);
+                }
+            }"
+            class="mb-1">
+                <button @click="toggle()" 
                         class="w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all duration-200 hover:bg-white/10 group">
                     <div class="flex items-center gap-2 sm:gap-3">
                         <i class="fas fa-chart-line text-white/80 text-base sm:text-lg w-5 group-hover:text-white transition-colors"></i>
                         <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" 
                               x-transition.duration.200 
                               class="text-xs sm:text-sm font-medium text-white/80 group-hover:text-white whitespace-nowrap">
-                            Inteligencia de Negocios
+                            Int. de Neg. BI
                         </span>
                     </div>
                     <i x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" 
@@ -53,7 +71,7 @@
                 <div x-show="open" 
                      x-collapse
                      x-cloak
-                     class="ml-6 sm:ml-10 mt-1 space-y-1">
+                     class="ml-2 sm:ml-3 mt-1 space-y-1">
                     @if($role == 'admin')
                         <a href="{{ route('dashboard.administrador') }}" 
                            class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
@@ -88,8 +106,21 @@
 
             <!-- Catálogo y Menú -->
             @if(in_array($role, ['admin', 'cocinero']))
-            <div x-data="{ open: true }" class="mb-1">
-                <button @click="open = !open" 
+            <div x-data="{ 
+                open: localStorage.getItem('sidebar_section_catalogo') === 'true',
+                toggle() {
+                    this.open = !this.open;
+                    localStorage.setItem('sidebar_section_catalogo', this.open);
+                }
+            }"
+            x-init="() => {
+                if (localStorage.getItem('sidebar_section_catalogo') === null) {
+                    open = false;
+                    localStorage.setItem('sidebar_section_catalogo', false);
+                }
+            }"
+            class="mb-1">
+                <button @click="toggle()" 
                         class="w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all duration-200 hover:bg-white/10 group">
                     <div class="flex items-center gap-2 sm:gap-3">
                         <i class="fas fa-book-open text-white/80 text-base sm:text-lg w-5 group-hover:text-white transition-colors"></i>
@@ -107,7 +138,7 @@
                 <div x-show="open" 
                      x-collapse
                      x-cloak
-                     class="ml-6 sm:ml-10 mt-1 space-y-1">
+                     class="ml-2 sm:ml-3 mt-1 space-y-1">
                     <a href="{{ route('platos.index') }}" 
                        class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
                         <i class="fas fa-utensils text-[10px] sm:text-xs w-4"></i>
@@ -119,8 +150,21 @@
 
             <!-- Mesas -->
             @if(in_array($role, ['admin', 'mesero']))
-            <div x-data="{ open: true }" class="mb-1">
-                <button @click="open = !open" 
+            <div x-data="{ 
+                open: localStorage.getItem('sidebar_section_mesas') === 'true',
+                toggle() {
+                    this.open = !this.open;
+                    localStorage.setItem('sidebar_section_mesas', this.open);
+                }
+            }"
+            x-init="() => {
+                if (localStorage.getItem('sidebar_section_mesas') === null) {
+                    open = false;
+                    localStorage.setItem('sidebar_section_mesas', false);
+                }
+            }"
+            class="mb-1">
+                <button @click="toggle()" 
                         class="w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all duration-200 hover:bg-white/10 group">
                     <div class="flex items-center gap-2 sm:gap-3">
                         <i class="fas fa-chair text-white/80 text-base sm:text-lg w-5 group-hover:text-white transition-colors"></i>
@@ -138,7 +182,7 @@
                 <div x-show="open" 
                      x-collapse
                      x-cloak
-                     class="ml-6 sm:ml-10 mt-1">
+                     class="ml-2 sm:ml-3 mt-1">
                     <a href="{{ route('mesas.index') }}" 
                        class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
                         <i class="fas fa-table text-[10px] sm:text-xs w-4"></i>
@@ -150,8 +194,21 @@
 
             <!-- Operaciones -->
             @if(in_array($role, ['admin', 'cajero']))
-            <div x-data="{ open: true }" class="mb-1">
-                <button @click="open = !open" 
+            <div x-data="{ 
+                open: localStorage.getItem('sidebar_section_operaciones') === 'true',
+                toggle() {
+                    this.open = !this.open;
+                    localStorage.setItem('sidebar_section_operaciones', this.open);
+                }
+            }"
+            x-init="() => {
+                if (localStorage.getItem('sidebar_section_operaciones') === null) {
+                    open = false;
+                    localStorage.setItem('sidebar_section_operaciones', false);
+                }
+            }"
+            class="mb-1">
+                <button @click="toggle()" 
                         class="w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all duration-200 hover:bg-white/10 group">
                     <div class="flex items-center gap-2 sm:gap-3">
                         <i class="fas fa-cash-register text-white/80 text-base sm:text-lg w-5 group-hover:text-white transition-colors"></i>
@@ -169,7 +226,7 @@
                 <div x-show="open" 
                      x-collapse
                      x-cloak
-                     class="ml-6 sm:ml-10 mt-1 space-y-1">
+                     class="ml-2 sm:ml-3 mt-1 space-y-1">
                     <a href="{{ route('pedidos.index') }}" 
                        class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
                         <i class="fas fa-clipboard-list text-[10px] sm:text-xs w-4"></i>
@@ -209,8 +266,21 @@
 
             <!-- Administración -->
             @if($role == 'admin')
-            <div x-data="{ open: true }" class="mb-1">
-                <button @click="open = !open" 
+            <div x-data="{ 
+                open: localStorage.getItem('sidebar_section_administracion') === 'true',
+                toggle() {
+                    this.open = !this.open;
+                    localStorage.setItem('sidebar_section_administracion', this.open);
+                }
+            }"
+            x-init="() => {
+                if (localStorage.getItem('sidebar_section_administracion') === null) {
+                    open = false;
+                    localStorage.setItem('sidebar_section_administracion', false);
+                }
+            }"
+            class="mb-1">
+                <button @click="toggle()" 
                         class="w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all duration-200 hover:bg-white/10 group">
                     <div class="flex items-center gap-2 sm:gap-3">
                         <i class="fas fa-user-shield text-white/80 text-base sm:text-lg w-5 group-hover:text-white transition-colors"></i>
@@ -228,7 +298,7 @@
                 <div x-show="open" 
                      x-collapse
                      x-cloak
-                     class="ml-6 sm:ml-10 mt-1">
+                     class="ml-2 sm:ml-3 mt-1">
                     <a href="{{ route('usuarios.index') }}" 
                        class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
                         <i class="fas fa-users text-[10px] sm:text-xs w-4"></i>

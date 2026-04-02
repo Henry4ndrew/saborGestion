@@ -54,36 +54,39 @@
                 
                 <!-- Navbar Superior con Perfil y Logout -->
                 <nav class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10">
-                    <div class="px-4 sm:px-6 py-3 flex items-center justify-between">
-                        <!-- Botón hamburguesa para móvil -->
-                        <button @click="toggleMobileSidebar()"
-                                class="p-2 -ml-2 rounded-lg lg:hidden hover:bg-gray-100 transition-colors">
-                            <i class="fas fa-bars text-gray-600 text-xl"></i>
-                        </button>
+                    <div class="px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-between">
+                        <!-- Sección izquierda: Botón hamburguesa + Datos usuario -->
+                        <div class="flex items-center gap-2 sm:gap-3">
+                            <!-- Botón hamburguesa para móvil -->
+                            <button @click="toggleMobileSidebar()"
+                                    class="p-1.5 sm:p-2 -ml-1.5 sm:-ml-2 rounded-lg lg:hidden hover:bg-gray-100 transition-colors">
+                                <i class="fas fa-bars text-gray-600 text-lg sm:text-xl"></i>
+                            </button>
 
-                        <!-- IZQUIERDA: Usuario -->
-                        <div class="flex items-center gap-3 ml-auto lg:ml-0">
-                            <div class="w-8 h-8 rounded-lg bg-primary bg-opacity-10 flex items-center justify-center">
-                                <i class="fas fa-user-alt text-primary text-sm"></i>
-                            </div>
+                            <!-- Datos del Usuario (siempre visibles) -->
+                            <div class="flex items-center gap-2 sm:gap-3">
+                                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary bg-opacity-10 flex items-center justify-center">
+                                    <i class="fas fa-user-alt text-primary text-xs sm:text-sm"></i>
+                                </div>
 
-                            <div class="text-left hidden xs:block">
-                                <p class="text-sm font-medium text-gray-700">
-                                    {{ Auth::user()->name }}
-                                </p>
-                                <p class="text-xs text-gray-500">
-                                    {{ ucfirst(Auth::user()->role) }}
-                                </p>
+                                <div class="text-left">
+                                    <p class="text-xs sm:text-sm font-medium text-gray-700">
+                                        {{ Auth::user()->name }}
+                                    </p>
+                                    <p class="text-[10px] sm:text-xs text-gray-500 hidden xs:block">
+                                        {{ ucfirst(Auth::user()->role) }}
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- DERECHA: Logout -->
-                        <form method="POST" action="{{ route('logout') }}" class="ml-2">
+                        <!-- DERECHA: Logout (siempre con texto) -->
+                        <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" 
-                                    class="flex items-center gap-2 px-2 sm:px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                                <i class="fas fa-sign-out-alt text-red-500"></i>
-                                <span class="hidden sm:inline">Cerrar Sesión</span>
+                                    class="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors whitespace-nowrap">
+                                <i class="fas fa-sign-out-alt text-red-500 text-sm sm:text-base"></i>
+                                <span class="text-xs sm:text-sm">Cerrar Sesión</span>
                             </button>
                         </form>
                     </div>

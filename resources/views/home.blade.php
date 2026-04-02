@@ -42,7 +42,7 @@
                           class="object-contain w-16 h-16 md:w-20 md:h-20 rounded-full">
                     <div>
                         <h1 class="text-xl font-bold text-transparent md:text-2xl bg-gradient-to-r from-primary to-secondary bg-clip-text">
-                            SaborGestion
+                            Sabor Gestión
                         </h1>
                         <p class="hidden text-xs text-gray-500 sm:block">Sistema Gastronómico Integral</p>
                     </div>
