@@ -1,4 +1,3 @@
-// database/migrations/2024_01_01_000000_add_role_to_users_table.php
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -10,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->enum('role', ['admin', 'mesero', 'cocinero', 'cajero'])->default('mesero');
+            $table->enum('role', ['admin', 'mesero', 'cocinero', 'cajero', 'cliente'])->default('cliente');
         });
     }
 

@@ -8,11 +8,7 @@ use Illuminate\Support\Facades\Hash;
 
 class UsuarioController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('role:admin');
-    }
-    
+
     public function index()
     {
         $usuarios = User::all();

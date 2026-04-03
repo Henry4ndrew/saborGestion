@@ -219,34 +219,40 @@ También especificar como implementar el sistema en casos necesarios (comandos, 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
-// Admin
 User::create([
-    'name' => 'Administrador2',
-    'email' => 'admin2@saborgestion.com',
+    'name' => 'Administrador3',
+    'email' => 'admin3@saborgestion.com',
+    'password' => '12345678',
+    'role' => 'admin'
+]);
+
+User::create([
+    'name' => 'Administrador4',
+    'email' => 'admin4@saborgestion.com',
     'password' => '12345678',
     'role' => 'admin'
 ]);
 
 // Mesero
 User::create([
-    'name' => 'Mesero',
-    'email' => 'mesero@saborgestion.com',
+    'name' => 'Mesero3',
+    'email' => 'mesero3@saborgestion.com',
     'password' => '12345678',
     'role' => 'mesero'
 ]);
 
 // Cocinero
 User::create([
-    'name' => 'Cocinero',
-    'email' => 'cocinero@saborgestion.com',
+    'name' => 'Cocinero3',
+    'email' => 'cocinero3@saborgestion.com',
     'password' => '12345678',
     'role' => 'cocinero'
 ]);
 
 // Cajero
 User::create([
-    'name' => 'Cajero',
-    'email' => 'cajero@saborgestion.com',
+    'name' => 'Cajero3',
+    'email' => 'cajero3@saborgestion.com',
     'password' => '12345678',
     'role' => 'cajero'
 ]);
