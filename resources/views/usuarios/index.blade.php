@@ -67,14 +67,144 @@
         </div>
     </div>
     
-    <!-- Modificado: Agregar persistencia en localStorage -->
+    <!-- Panel de Búsqueda y Filtros -->
+    <div class="card p-4 mb-6">
+        <form method="GET" action="{{ route('usuarios.index') }}" id="filterForm">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <!-- Buscador inteligente -->
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-text mb-2">
+                        <i class="fas fa-search mr-1 text-primary"></i> Buscar por nombre o email
+                    </label>
+                    <div class="flex gap-2">
+                        <div class="relative flex-1">
+                            <input type="text" 
+                                   name="search" 
+                                   value="{{ request('search') }}"
+                                   placeholder="Ej: José Pérez, juan@email.com..."
+                                   class="w-full px-4 py-2 pl-10 pr-10 rounded-lg border border-border focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                                   id="searchInput">
+                            <i class="fas fa-search absolute left-3 top-3 text-muted"></i>
+                            @if(request('search'))
+                                <button type="button" id="clearSearch" class="absolute right-3 top-2 text-muted hover:text-red-500 transition-colors">
+                                    <i class="fas fa-times-circle"></i>
+                                </button>
+                            @endif
+                        </div>
+                        <button type="submit" class="btn-primary px-6">
+                            <i class="fas fa-search mr-2"></i> Buscar
+                        </button>
+                    </div>
+                    <p class="text-xs text-muted mt-1">
+                        <i class="fas fa-info-circle"></i> No distingue mayúsculas, acentos o espacios
+                    </p>
+                </div>
+
+                <!-- Filtro por Rol -->
+                <div>
+                    <label class="block text-sm font-medium text-text mb-2">
+                        <i class="fas fa-user-tag mr-1 text-primary"></i> Filtrar por Rol
+                    </label>
+                    <div class="relative">
+                        <select name="rol" 
+                                id="rolFilter"
+                                class="w-full px-4 py-2 pl-10 pr-8 rounded-lg border border-border focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none bg-white cursor-pointer">
+                            <option value="">Todos los roles</option>
+                            <option value="admin" {{ request('rol') == 'admin' ? 'selected' : '' }}>👑 Administradores</option>
+                            <option value="mesero" {{ request('rol') == 'mesero' ? 'selected' : '' }}>🍽️ Meseros</option>
+                            <option value="cocinero" {{ request('rol') == 'cocinero' ? 'selected' : '' }}>👨‍🍳 Cocineros</option>
+                            <option value="cajero" {{ request('rol') == 'cajero' ? 'selected' : '' }}>💰 Cajeros</option>
+                            <option value="cliente" {{ request('rol') == 'cliente' ? 'selected' : '' }}>👥 Clientes</option>
+                        </select>
+                        <i class="fas fa-users absolute left-3 top-3 text-muted"></i>
+                        <i class="fas fa-chevron-down absolute right-3 top-3 text-muted pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <!-- Filtro por Calificación -->
+                <div>
+                    <label class="block text-sm font-medium text-text mb-2">
+                        <i class="fas fa-star mr-1 text-yellow-500"></i> Filtrar por Calificación
+                    </label>
+                    <div class="relative">
+                        <select name="calificacion" 
+                                id="scoreFilter"
+                                class="w-full px-4 py-2 pl-10 pr-8 rounded-lg border border-border focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none bg-white cursor-pointer">
+                            <option value="">Todas las calificaciones</option>
+                            <option value="5" {{ request('calificacion') == '5' ? 'selected' : '' }}>⭐⭐⭐⭐⭐ 5 estrellas</option>
+                            <option value="4" {{ request('calificacion') == '4' ? 'selected' : '' }}>⭐⭐⭐⭐ 4 estrellas</option>
+                            <option value="3" {{ request('calificacion') == '3' ? 'selected' : '' }}>⭐⭐⭐ 3 estrellas</option>
+                            <option value="2" {{ request('calificacion') == '2' ? 'selected' : '' }}>⭐⭐ 2 estrellas</option>
+                            <option value="1" {{ request('calificacion') == '1' ? 'selected' : '' }}>⭐ 1 estrella</option>
+                            <option value="0" {{ request('calificacion') == '0' ? 'selected' : '' }}>☆ Sin calificación</option>
+                            <option value="alta" {{ request('calificacion') == 'alta' ? 'selected' : '' }}>🌟 Alta (4-5 estrellas)</option>
+                            <option value="media" {{ request('calificacion') == 'media' ? 'selected' : '' }}>⭐ Media (2-3 estrellas)</option>
+                            <option value="baja" {{ request('calificacion') == 'baja' ? 'selected' : '' }}>💫 Baja (0-1 estrellas)</option>
+                        </select>
+                        <i class="fas fa-star absolute left-3 top-3 text-yellow-500"></i>
+                        <i class="fas fa-chevron-down absolute right-3 top-3 text-muted pointer-events-none"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de acción adicionales -->
+            @if(request('search') || request('rol') || request('calificacion'))
+                <div class="flex justify-end mt-4">
+                    <a href="{{ route('usuarios.index') }}" class="btn-secondary px-6">
+                        <i class="fas fa-undo-alt mr-2"></i> Limpiar todos los filtros
+                    </a>
+                </div>
+            @endif
+        </form>
+    </div>
+
+    <!-- Resultados de búsqueda -->
+    <div class="flex justify-between items-center mb-2">
+        <p class="text-sm text-muted">
+            <i class="fas fa-chart-line mr-1"></i> 
+            Mostrando {{ $usuarios->count() }} de {{ $totalUsuarios }} usuarios
+            @if(request('search'))
+                <span class="ml-2 px-2 py-1 bg-primary/10 rounded-full text-xs">
+                    <i class="fas fa-search mr-1"></i> Búsqueda: "{{ request('search') }}"
+                </span>
+            @endif
+            @if(request('rol'))
+                <span class="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                    <i class="fas fa-user-tag mr-1"></i> Rol: {{ request('rol') }}
+                </span>
+            @endif
+            @if(request('calificacion'))
+                <span class="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">
+                    <i class="fas fa-star mr-1"></i> Calificación: {{ request('calificacion') }}
+                </span>
+            @endif
+        </p>
+    </div>
+
+    
+
+   <!-- Pestañas con cambio automático y limpieza de filtros -->
     <div class="card" x-data="{ 
-        activeTab: localStorage.getItem('usuarios_active_tab') || 'restaurante',
+        activeTab: (() => {
+            if ('{{ request('rol') }}' === 'cliente') {
+                return 'clientes';
+            }
+            if ('{{ request('rol') }}' === 'admin' || '{{ request('rol') }}' === 'mesero' || '{{ request('rol') }}' === 'cocinero' || '{{ request('rol') }}' === 'cajero') {
+                return 'restaurante';
+            }
+            let savedTab = localStorage.getItem('usuarios_active_tab');
+            return (savedTab === 'restaurante' || savedTab === 'clientes') ? savedTab : 'restaurante';
+        })(),
         setActiveTab(tab) {
-            this.activeTab = tab;
             localStorage.setItem('usuarios_active_tab', tab);
+            const url = new URL(window.location.href);
+            url.searchParams.delete('search');
+            url.searchParams.delete('rol');
+            url.searchParams.delete('calificacion');
+            window.location.href = url.toString();
         }
     }">
+
         <!-- Pestañas -->
         <div class="border-b border-border mb-6">
             <nav class="flex space-x-8">
@@ -152,9 +282,19 @@
                                 @endif
                             </td>
                             <td class="py-3 px-4">
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-accent bg-opacity-20 text-primary">
-                                    <i class="fas fa-star mr-1"></i> {{ $usuario->score ?? 0 }} pts
-                                </span>
+                                <div class="flex items-center space-x-1">
+                                    @php
+                                        $score = $usuario->score ?? 0;
+                                    @endphp
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($i <= $score)
+                                            <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                        @else
+                                            <i class="far fa-star text-gray-300 text-sm"></i>
+                                        @endif
+                                    @endfor
+                                    <span class="ml-2 text-xs font-medium text-muted">({{ $score }})</span>
+                                </div>
                             </td>
                             <td class="py-3 px-4">
                                 <a href="{{ route('usuarios.edit', $usuario) }}" class="text-primary hover:text-secondary mr-3 transition-colors">
@@ -230,9 +370,19 @@
                                 @endif
                             </td>
                             <td class="py-3 px-4">
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-accent bg-opacity-20 text-primary">
-                                    <i class="fas fa-star mr-1"></i> {{ $usuario->score ?? 0 }} pts
-                                </span>
+                                <div class="flex items-center space-x-1">
+                                    @php
+                                        $score = $usuario->score ?? 0;
+                                    @endphp
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($i <= $score)
+                                            <i class="fas fa-star text-yellow-400 text-sm"></i>
+                                        @else
+                                            <i class="far fa-star text-gray-300 text-sm"></i>
+                                        @endif
+                                    @endfor
+                                    <span class="ml-2 text-xs font-medium text-muted">({{ $score }})</span>
+                                </div>
                             </td>
                             <td class="py-3 px-4">
                                 <a href="{{ route('usuarios.edit', $usuario) }}" class="text-primary hover:text-secondary mr-3 transition-colors">
@@ -267,14 +417,58 @@
 
 <style>
     [x-cloak] { display: none !important; }
+    
+    /* Estilos para botones */
+    .btn-secondary {
+        @apply bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all duration-200 inline-flex items-center;
+    }
+    
+    /* Efecto hover en filas de tabla */
+    tbody tr {
+        transition: all 0.2s ease;
+    }
+    
+    /* Mejora visual para selects */
+    select {
+        cursor: pointer;
+    }
+    
+    select:hover {
+        border-color: #cbd5e1;
+    }
 </style>
 
 <script>
-    // Limpiar el almacenamiento cuando el usuario cierra la sesión (opcional)
     document.addEventListener('DOMContentLoaded', function() {
-        // Si quieres que la pestaña se reinicie al cerrar sesión, puedes agregar un listener
-        // o simplemente dejar que persista entre sesiones
         console.log('Pestaña activa guardada:', localStorage.getItem('usuarios_active_tab'));
+        
+        // Auto-submit para selects (filtros automáticos)
+        const rolFilter = document.getElementById('rolFilter');
+        const scoreFilter = document.getElementById('scoreFilter');
+        const filterForm = document.getElementById('filterForm');
+        
+        if (rolFilter) {
+            rolFilter.addEventListener('change', function() {
+                filterForm.submit();
+            });
+        }
+        
+        if (scoreFilter) {
+            scoreFilter.addEventListener('change', function() {
+                filterForm.submit();
+            });
+        }
+        
+        // Botón para limpiar búsqueda
+        const clearSearchBtn = document.getElementById('clearSearch');
+        const searchInput = document.getElementById('searchInput');
+        
+        if (clearSearchBtn && searchInput) {
+            clearSearchBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                filterForm.submit();
+            });
+        }
     });
 </script>
 @endsection
