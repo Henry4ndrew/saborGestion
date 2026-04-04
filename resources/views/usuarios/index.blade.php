@@ -131,10 +131,10 @@
                                 id="scoreFilter"
                                 class="w-full px-4 py-2 pl-10 pr-8 rounded-lg border border-border focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none bg-white cursor-pointer">
                             <option value="">Todas las calificaciones</option>
-                            <option value="5" {{ request('calificacion') == '5' ? 'selected' : '' }}>⭐⭐⭐⭐⭐ 5 estrellas</option>
-                            <option value="4" {{ request('calificacion') == '4' ? 'selected' : '' }}>⭐⭐⭐⭐ 4 estrellas</option>
-                            <option value="3" {{ request('calificacion') == '3' ? 'selected' : '' }}>⭐⭐⭐ 3 estrellas</option>
-                            <option value="2" {{ request('calificacion') == '2' ? 'selected' : '' }}>⭐⭐ 2 estrellas</option>
+                            <option value="5" {{ request('calificacion') == '5' ? 'selected' : '' }}>⭐ 5 estrellas</option>
+                            <option value="4" {{ request('calificacion') == '4' ? 'selected' : '' }}>⭐ 4 estrellas</option>
+                            <option value="3" {{ request('calificacion') == '3' ? 'selected' : '' }}>⭐ 3 estrellas</option>
+                            <option value="2" {{ request('calificacion') == '2' ? 'selected' : '' }}>⭐ 2 estrellas</option>
                             <option value="1" {{ request('calificacion') == '1' ? 'selected' : '' }}>⭐ 1 estrella</option>
                             <option value="0" {{ request('calificacion') == '0' ? 'selected' : '' }}>☆ Sin calificación</option>
                             <option value="alta" {{ request('calificacion') == 'alta' ? 'selected' : '' }}>🌟 Alta (4-5 estrellas)</option>
