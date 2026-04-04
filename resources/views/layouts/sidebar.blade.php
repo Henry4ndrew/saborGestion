@@ -152,6 +152,38 @@
                         <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Platos</span>
                     </a>
                 </div>
+
+                <div x-show="open" 
+                    x-collapse
+                    x-cloak
+                    class="ml-2 sm:ml-3 mt-1 space-y-1">
+                    <a href="{{ route('categorias.index') }}" 
+                    class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
+                        
+                        <i class="fas fa-tags text-[10px] sm:text-xs w-4"></i>
+
+                        <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" 
+                            class="whitespace-nowrap">
+                            Categorías
+                        </span>
+                    </a>
+                </div>
+                <div x-show="open" 
+                    x-collapse
+                    x-cloak
+                    class="ml-2 sm:ml-3 mt-1 space-y-1">
+                    <a href="{{ route('ingredientes.index') }}" 
+                    class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
+                        
+                        <i class="fas fa-carrot text-[10px] sm:text-xs w-4"></i>
+
+                        <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" 
+                            class="whitespace-nowrap">
+                            Ingredientes
+                        </span>
+                    </a>
+                </div>
+                
             </div>
             @endif
 
