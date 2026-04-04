@@ -46,6 +46,9 @@ build: configurar vite
 ci → Cambios en integración continua
 ci: agregar workflow de GitHub Actions
 
+
+*Ejemplo de uso:*
+git commit -m "feat: Implementación básica de ingredientes y categorías"
 ====================================================
 
 

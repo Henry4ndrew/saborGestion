@@ -49,10 +49,18 @@
                                         </option>
                                     @endforeach
                                 </select>
-                                <button type="button" onclick="openCategoriaModal()" class="btn-secondary px-4">
+                                <a href="{{ route('categorias.create') }}" 
+                                   target="_blank" 
+                                   class="btn-secondary px-4 inline-flex items-center justify-center">
                                     <i class="fas fa-plus"></i>
-                                </button>
+                                </a>
                             </div>
+                            <p class="text-xs text-muted mt-1">
+                                <i class="fas fa-info-circle"></i> 
+                                ¿No encuentras la categoría? 
+                                <a href="{{ route('categorias.create') }}" target="_blank" class="text-primary">Créala aquí</a> 
+                                y actualiza la página
+                            </p>
                             @error('categoria_id')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
@@ -84,9 +92,11 @@
                 <div>
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-xl font-semibold text-text">Ingredientes</h2>
-                        <button type="button" onclick="openIngredienteModal()" class="btn-secondary text-sm">
+                        <a href="{{ route('ingredientes.create') }}" 
+                           target="_blank" 
+                           class="btn-secondary text-sm inline-flex items-center justify-center">
                             <i class="fas fa-plus mr-1"></i> Nuevo Ingrediente
-                        </button>
+                        </a>
                     </div>
                     
                     <div id="ingredientes-container" class="space-y-3">
@@ -98,6 +108,13 @@
                     <button type="button" onclick="agregarIngrediente()" class="mt-3 text-primary hover:text-secondary">
                         <i class="fas fa-plus-circle mr-1"></i> Agregar ingrediente existente
                     </button>
+                    
+                    <p class="text-xs text-muted mt-2">
+                        <i class="fas fa-info-circle"></i> 
+                        ¿No encuentras el ingrediente? 
+                        <a href="{{ route('ingredientes.create') }}" target="_blank" class="text-primary">Créalo aquí</a> 
+                        y actualiza la página
+                    </p>
                 </div>
                 
                 <div class="flex justify-end space-x-3 pt-4">
@@ -110,75 +127,15 @@
     </div>
 </div>
 
-<!-- Modal para crear categoría -->
-<div id="categoriaModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <h3 class="text-xl font-bold mb-4">Nueva Categoría</h3>
-        <form id="categoriaForm">
-            @csrf
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium mb-2">Nombre *</label>
-                    <input type="text" name="nombre" required class="w-full px-4 py-2 rounded-lg border border-border">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-2">Icono (Font Awesome)</label>
-                    <input type="text" name="icono" placeholder="fa-utensils" class="w-full px-4 py-2 rounded-lg border border-border">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-2">Descripción</label>
-                    <textarea name="descripcion" rows="2" class="w-full px-4 py-2 rounded-lg border border-border"></textarea>
-                </div>
-            </div>
-            <div class="flex justify-end space-x-3 mt-6">
-                <button type="button" onclick="closeCategoriaModal()" class="btn-secondary">Cancelar</button>
-                <button type="submit" class="btn-primary">Crear</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Modal para crear ingrediente -->
-<div id="ingredienteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <h3 class="text-xl font-bold mb-4">Nuevo Ingrediente</h3>
-        <form id="ingredienteForm" enctype="multipart/form-data">
-            @csrf
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium mb-2">Nombre *</label>
-                    <input type="text" name="nombre" required class="w-full px-4 py-2 rounded-lg border border-border">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-2">Unidad de Medida *</label>
-                    <select name="unidad_medida" required class="w-full px-4 py-2 rounded-lg border border-border">
-                        <option value="gr">Gramos (gr)</option>
-                        <option value="ml">Mililitros (ml)</option>
-                        <option value="unidad">Unidad</option>
-                        <option value="cda">Cucharada (cda)</option>
-                        <option value="cdta">Cucharadita (cdta)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-2">Foto</label>
-                    <input type="file" name="foto" accept="image/*" class="w-full px-4 py-2 rounded-lg border border-border">
-                </div>
-            </div>
-            <div class="flex justify-end space-x-3 mt-6">
-                <button type="button" onclick="closeIngredienteModal()" class="btn-secondary">Cancelar</button>
-                <button type="submit" class="btn-primary">Crear</button>
-            </div>
-        </form>
-    </div>
-</div>
-
 @push('scripts')
 <script>
-let ingredientesSeleccionados = [];
-
 function agregarIngrediente() {
-    // Mostrar modal o select de ingredientes existentes
     const ingredientesExistentes = @json($ingredientes);
+    
+    if (ingredientesExistentes.length === 0) {
+        alert('No hay ingredientes disponibles. Crea un ingrediente primero.');
+        return;
+    }
     
     let html = `
         <div class="flex gap-3 items-start border border-border rounded-lg p-3 bg-background">
@@ -204,88 +161,15 @@ function agregarIngrediente() {
     container.insertAdjacentHTML('beforeend', html);
 }
 
-function openCategoriaModal() {
-    document.getElementById('categoriaModal').classList.remove('hidden');
-    document.getElementById('categoriaModal').classList.add('flex');
-}
-
-function closeCategoriaModal() {
-    document.getElementById('categoriaModal').classList.add('hidden');
-    document.getElementById('categoriaModal').classList.remove('flex');
-    document.getElementById('categoriaForm').reset();
-}
-
-function openIngredienteModal() {
-    document.getElementById('ingredienteModal').classList.remove('hidden');
-    document.getElementById('ingredienteModal').classList.add('flex');
-}
-
-function closeIngredienteModal() {
-    document.getElementById('ingredienteModal').classList.add('hidden');
-    document.getElementById('ingredienteModal').classList.remove('flex');
-    document.getElementById('ingredienteForm').reset();
-}
-
-document.getElementById('categoriaForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    
-    try {
-        const response = await fetch('{{ route("categorias.store") }}', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json'
-            },
-            body: formData
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            // Agregar la nueva categoría al select
-            const select = document.querySelector('select[name="categoria_id"]');
-            const option = document.createElement('option');
-            option.value = data.categoria.id;
-            option.textContent = data.categoria.nombre;
-            select.appendChild(option);
-            select.value = data.categoria.id;
-            
-            closeCategoriaModal();
-            alert('Categoría creada exitosamente');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error al crear la categoría');
-    }
+// Mensaje para recargar cuando la ventana vuelve a tener foco
+window.addEventListener('focus', function() {
+    // Verificar si hay nuevos datos (opcional)
+    fetch('{{ route("categorias.index") }}', { method: 'HEAD' })
+        .catch(() => {});
 });
 
-document.getElementById('ingredienteForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    
-    try {
-        const response = await fetch('{{ route("ingredientes.store") }}', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json'
-            },
-            body: formData
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            closeIngredienteModal();
-            // Recargar la página para mostrar el nuevo ingrediente en el select
-            location.reload();
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error al crear el ingrediente');
-    }
-});
+// Instrucción para el usuario
+console.log('Consejo: Para agregar nuevas categorías o ingredientes, ábrelos en nueva pestaña y recarga esta página');
 </script>
 @endpush
 @endsection
