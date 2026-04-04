@@ -21,7 +21,6 @@ return new class extends Migration
             $table->enum('role', ['admin', 'mesero', 'cocinero', 'cajero', 'cliente'])
                 ->default('cliente');
 
-            // 👇 nuevos campos opcionales
             $table->string('celular')->nullable();
             $table->string('direccion')->nullable();
             $table->integer('score')->default(0);

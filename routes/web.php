@@ -29,6 +29,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/mesero', [DashboardController::class, 'mesero'])->name('dashboard.mesero');
     Route::get('/dashboard/cocinero', [DashboardController::class, 'cocinero'])->name('dashboard.cocinero');
     Route::get('/dashboard/cajero', [DashboardController::class, 'cajero'])->name('dashboard.cajero');
+    Route::get('/dashboard/cliente', [DashboardController::class, 'cliente'])->name('dashboard.cliente');
     
     // Gestión de Productos
     Route::resource('platos', PlatoController::class)->middleware('role:admin,cocinero');

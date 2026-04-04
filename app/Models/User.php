@@ -15,6 +15,9 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'celular',
+        'direccion',
+        'score',
     ];
 
     protected $hidden = [
@@ -48,5 +51,10 @@ class User extends Authenticatable
     public function isCajero()
     {
         return $this->role === 'cajero';
+    }
+
+    public function isCliente()
+    {
+        return $this->role === 'cliente';
     }
 }

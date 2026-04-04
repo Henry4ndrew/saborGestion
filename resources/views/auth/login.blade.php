@@ -91,16 +91,7 @@
                         </div>
 
                         <!-- Opciones adicionales -->
-                        <div class="flex items-center justify-between">
-                            <label class="flex items-center cursor-pointer group">
-                                <input type="checkbox"
-                                    class="transition-all duration-200 border-gray-300 rounded shadow-sm text-primary focus:ring-primary focus:ring-2"
-                                    name="remember">
-                                <span class="ml-2 text-sm text-gray-600 transition-colors duration-200 group-hover:text-primary">
-                                    Recordarme
-                                </span>
-                            </label>
-
+                        <div class="flex items-center justify-end">
                             @if (Route::has('password.request'))
                                 <a class="text-sm font-medium transition-colors duration-200 text-primary hover:text-primary/80"
                                    href="{{ route('password.request') }}">

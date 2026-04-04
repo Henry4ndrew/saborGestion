@@ -42,9 +42,6 @@
             </div>
 
 
-
-
-
             <!-- Card de registro -->
             <div class="overflow-hidden transition-all duration-300 shadow-2xl bg-white/95 backdrop-blur-sm rounded-2xl hover:shadow-3xl">
                 <div class="px-6 py-8 sm:p-8">
@@ -60,9 +57,7 @@
                             <x-input-label for="name" :value="__('Nombre completo')" class="mb-1 text-sm font-semibold text-gray-700" />
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                    </svg>
+                                    <i class="text-gray-400 fas fa-user"></i>
                                 </div>
                                 <x-text-input id="name" 
                                     class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-white/90" 
@@ -82,9 +77,7 @@
                             <x-input-label for="email" :value="__('Correo electrónico')" class="mb-1 text-sm font-semibold text-gray-700" />
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
-                                    </svg>
+                                    <i class="text-gray-400 fas fa-envelope"></i>
                                 </div>
                                 <x-text-input id="email" 
                                     class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-white/90" 
@@ -103,9 +96,7 @@
                             <x-input-label for="password" :value="__('Contraseña')" class="mb-1 text-sm font-semibold text-gray-700" />
                             <div class="relative">
                                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6-4h12a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6a2 2 0 012-2zm10-4V6a4 4 0 00-8 0v4h8z" />
-                                    </svg>
+                                    <i class="text-gray-400 fas fa-lock"></i>
                                 </div>
                                 <x-text-input id="password" 
                                     class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 bg-white/90"
@@ -136,6 +127,38 @@
                                     placeholder="Repite tu contraseña" />
                             </div>
                             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-1 text-sm text-red-500" />
+                        </div>
+
+                        <!-- Celular -->
+                        <div>
+                            <x-input-label for="celular" value="Celular" class="mb-1 text-sm font-semibold text-gray-700" />
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                    <i class="text-gray-400 fas fa-phone"></i>
+                                </div>
+                                <x-text-input id="celular" 
+                                    class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary bg-white/90"
+                                    type="text" 
+                                    name="celular"
+                                    :value="old('celular')"
+                                    placeholder="Ej: 70012345" />
+                            </div>
+                        </div>
+
+                        <!-- Dirección -->
+                        <div>
+                            <x-input-label for="direccion" value="Dirección" class="mb-1 text-sm font-semibold text-gray-700" />
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                    <i class="text-gray-400 fas fa-map-marker-alt"></i>
+                                </div>
+                                <x-text-input id="direccion" 
+                                    class="block w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary bg-white/90"
+                                    type="text" 
+                                    name="direccion"
+                                    :value="old('direccion')"
+                                    placeholder="Ej: Av. América #123" />
+                            </div>
                         </div>
 
                         <!-- Botones de acción -->

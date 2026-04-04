@@ -8,59 +8,69 @@ use Illuminate\Support\Facades\Hash;
 
 class UsuarioController extends Controller
 {
-
     public function index()
     {
         $usuarios = User::all();
         return view('usuarios.index', compact('usuarios'));
     }
-    
+
     public function create()
     {
         return view('usuarios.create');
     }
-    
+
     public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:8',
-            'role' => 'required|in:admin,mesero,cocinero,cajero',
+            'role' => 'required|in:admin,mesero,cocinero,cajero,cliente',
+            'celular' => 'nullable|string|max:20',
+            'direccion' => 'nullable|string|max:255',
         ]);
-        
+
         $validated['password'] = Hash::make($validated['password']);
-        
+
         User::create($validated);
-        
-        return redirect()->route('usuarios.index')->with('success', 'Usuario creado exitosamente');
+
+        return redirect()->route('usuarios.index')
+            ->with('success', 'Usuario creado exitosamente');
     }
-    
+
     public function edit(User $usuario)
     {
         return view('usuarios.edit', compact('usuario'));
     }
-    
+
     public function update(Request $request, User $usuario)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $usuario->id,
-            'role' => 'required|in:admin,mesero,cocinero,cajero',
+
+            'role' => 'required|in:admin,mesero,cocinero,cajero,cliente',
+
+            // 👇 nuevos campos
+            'celular' => 'nullable|string|max:20',
+            'direccion' => 'nullable|string|max:255',
         ]);
-        
+
         if ($request->filled('password')) {
             $validated['password'] = Hash::make($request->password);
         }
-        
+
         $usuario->update($validated);
-        
-        return redirect()->route('usuarios.index')->with('success', 'Usuario actualizado exitosamente');
+
+        return redirect()->route('usuarios.index')
+            ->with('success', 'Usuario actualizado exitosamente');
     }
-    
+
     public function destroy(User $usuario)
     {
         $usuario->delete();
-        return redirect()->route('usuarios.index')->with('success', 'Usuario eliminado exitosamente');
+
+        return redirect()->route('usuarios.index')
+            ->with('success', 'Usuario eliminado exitosamente');
     }
 }
