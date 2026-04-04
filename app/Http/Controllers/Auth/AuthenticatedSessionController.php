@@ -40,8 +40,10 @@ class AuthenticatedSessionController extends Controller
                 return redirect()->intended(route('dashboard.cocinero'));
             case 'cajero':
                 return redirect()->intended(route('dashboard.cajero'));
+            case 'cliente':
+                return redirect()->intended(route('dashboard.cliente'));
             default:
-                return redirect()->intended(route('dashboard.administrador'));
+                return redirect()->intended(route('dashboard.cliente'));
         }
     }
 
