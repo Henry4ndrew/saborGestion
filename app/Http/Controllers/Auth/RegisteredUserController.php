@@ -45,10 +45,8 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
 
-            // 👇 importante
             'role' => 'cliente',
 
-            // 👇 nuevos campos
             'celular' => $request->celular,
             'direccion' => $request->direccion,
         ]);
@@ -56,8 +54,7 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
-
-        // 👇 AQUÍ ESTÁ LA CLAVE (usar tu ruta existente)
+        
         return redirect()->route('dashboard.cliente');
     }
 }

@@ -692,6 +692,20 @@
         </div>
     </section>
 
+
+
+    <!-- DERECHA: Logout (siempre con texto) -->
+    <form method="POST" action="{{ route('logout') }}" style="width:450px; display:flex; margin:auto; background:#cdcdcd; justify-content:center; padding:2px; margin-bottom:20px;">
+        @csrf
+        <button type="submit" 
+                class="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors whitespace-nowrap">
+            <i class="fas fa-sign-out-alt text-red-500 text-sm sm:text-base"></i>
+            <span class="text-xs sm:text-sm">Cerrar Sesión</span>
+        </button>
+    </form>
+
+
+
     <!-- Footer -->
     <footer class="py-12 text-white bg-gray-900">
         <div class="container px-4 mx-auto sm:px-6 lg:px-8">
