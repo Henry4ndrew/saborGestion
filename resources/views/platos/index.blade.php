@@ -161,7 +161,7 @@
     </span>
 </td>
                         <td class="py-3 px-4">
-                            <span class="font-semibold text-primary">${{ number_format($plato->precio, 2) }}</span>
+                            <span class="font-semibold text-primary">Bs {{ number_format($plato->precio, 2) }}</span>
                         </td>
                         <td class="py-3 px-4">
                             <div class="flex items-center space-x-1">
