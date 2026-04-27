@@ -2,7 +2,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="space-y-6">
+<div class="space-y-6" x-data="{ showImageModal: false, modalImageUrl: '', modalImageTitle: '' }">
     <div class="flex justify-between items-center">
         <h1 class="text-3xl font-bold text-primary">Productos</h1>
         <a href="{{ route('platos.create') }}" class="btn-primary">
@@ -109,13 +109,16 @@
                 </div>
             </div>
 
-            @if(request()->anyFilled(['search', 'categoria', 'disponible', 'score']))
-                <div class="flex justify-end mt-4">
+            <div class="flex justify-end mt-4 space-x-2">
+                @if(request()->anyFilled(['search', 'categoria', 'disponible', 'score']))
                     <a href="{{ route('platos.index') }}" class="btn-secondary px-6">
                         <i class="fas fa-undo-alt mr-2"></i> Limpiar filtros
                     </a>
-                </div>
-            @endif
+                @endif
+                <button type="submit" class="btn-primary px-6">
+                    <i class="fas fa-filter mr-2"></i> Filtrar
+                </button>
+            </div>
         </form>
     </div>
 
@@ -139,7 +142,10 @@
                     <tr class="border-b border-border hover:bg-background transition-colors">
                         <td class="py-3 px-4">
                             @if($plato->imagen)
-                                <img src="{{ Storage::url($plato->imagen) }}" alt="{{ $plato->nombre }}" class="w-12 h-12 object-cover rounded-lg">
+                                <img src="{{ Storage::url($plato->imagen) }}" 
+                                     alt="{{ $plato->nombre }}" 
+                                     class="w-12 h-12 object-cover rounded-lg cursor-pointer hover:opacity-75 transition-opacity"
+                                     @click="modalImageUrl = '{{ Storage::url($plato->imagen) }}'; modalImageTitle = '{{ $plato->nombre }}'; showImageModal = true">
                             @else
                                 <div class="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
                                     <i class="fas fa-utensils text-gray-400"></i>
@@ -225,10 +231,55 @@
             {{ $platos->withQueryString()->links() }}
         </div>
     </div>
+
+    <!-- Modal de Imagen -->
+    <div x-show="showImageModal" 
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75"
+         x-cloak
+         @keydown.escape.window="showImageModal = false"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        
+        <div class="relative max-w-4xl w-full bg-white rounded-xl overflow-hidden shadow-2xl"
+             @click.away="showImageModal = false"
+             x-transition:enter="transition ease-out duration-300 transform"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-200 transform"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95">
+            
+            <div class="flex items-center justify-between p-4 border-b border-border">
+                <h3 class="text-xl font-bold text-text" x-text="modalImageTitle"></h3>
+                <button @click="showImageModal = false" class="text-muted hover:text-text transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <div class="p-2 bg-gray-50 flex justify-center items-center">
+                <img :src="modalImageUrl" :alt="modalImageTitle" class="max-w-full max-h-[70vh] object-contain rounded-lg shadow-inner">
+            </div>
+            
+            <div class="p-4 flex justify-end">
+                <button @click="showImageModal = false" class="btn-secondary">Cerrar</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
 <script>
+    // Auto-submit form when selects change
+    document.querySelectorAll('#filterForm select').forEach(select => {
+        select.addEventListener('change', () => {
+            document.getElementById('filterForm').submit();
+        });
+    });
+
     document.querySelectorAll('.toggle-disponible').forEach(button => {
         button.addEventListener('click', function() {
             const platoId = this.dataset.id;

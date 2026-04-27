@@ -132,44 +132,52 @@
                     
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-text mb-2">Agregar Ingrediente</label>
-                        <div class="relative">
-                            <!-- Selector personalizado -->
-                            <div @click="showDropdown = !showDropdown" 
-                                 class="w-full px-4 py-2 rounded-lg border border-border cursor-pointer flex justify-between items-center bg-white">
-                                <span x-text="selectedIngrediente ? selectedIngrediente.nombre : 'Seleccionar ingrediente'"></span>
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                            
-                            <!-- Dropdown -->
-                            <div x-show="showDropdown" 
-                                 x-cloak
-                                 @click.away="showDropdown = false"
-                                 class="absolute z-10 w-full mt-1 bg-white border border-border rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                                @foreach($ingredientes as $ingrediente)
-                                <div class="p-2 hover:bg-gray-100 cursor-pointer flex items-center space-x-3"
-                                     @click="selectedIngrediente = {
-                                         id: {{ $ingrediente->id }},
-                                         nombre: '{{ $ingrediente->nombre }}',
-                                         foto: '{{ $ingrediente->foto }}',
-                                         unidad: '{{ $ingrediente->unidad_medida }}',
-                                         cantidad: ''
-                                     }; showDropdown = false">
-                                    <div class="w-8 h-8">
-                                        @if($ingrediente->foto)
-                                            <img src="{{ Storage::url($ingrediente->foto) }}" class="w-full h-full object-cover rounded">
-                                        @else
-                                            <div class="w-full h-full bg-gray-200 rounded flex items-center justify-center">
-                                                <i class="fas fa-carrot text-gray-400 text-xs"></i>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    <div>
-                                        <p class="font-medium">{{ $ingrediente->nombre }}</p>
-                                        <p class="text-xs text-muted">{{ $ingrediente->unidad_medida }}</p>
-                                    </div>
+                        <div class="flex gap-2">
+                            <div class="relative flex-1">
+                                <!-- Selector personalizado -->
+                                <div @click="showDropdown = !showDropdown" 
+                                     class="w-full px-4 py-2 rounded-lg border border-border cursor-pointer flex justify-between items-center bg-white">
+                                    <span x-text="selectedIngrediente ? selectedIngrediente.nombre : 'Seleccionar ingrediente'"></span>
+                                    <i class="fas fa-chevron-down"></i>
                                 </div>
-                                @endforeach
+                                
+                                <!-- Dropdown -->
+                                <div x-show="showDropdown" 
+                                     x-cloak
+                                     @click.away="showDropdown = false"
+                                     class="absolute z-10 w-full mt-1 bg-white border border-border rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                    @foreach($ingredientes as $ingrediente)
+                                    <div class="p-2 hover:bg-gray-100 cursor-pointer flex items-center space-x-3"
+                                         @click="selectedIngrediente = {
+                                             id: {{ $ingrediente->id }},
+                                             nombre: '{{ $ingrediente->nombre }}',
+                                             foto: '{{ $ingrediente->foto }}',
+                                             unidad: '{{ $ingrediente->unidad_medida }}',
+                                             cantidad: ''
+                                         }; showDropdown = false">
+                                        <div class="w-8 h-8">
+                                            @if($ingrediente->foto)
+                                                <img src="{{ Storage::url($ingrediente->foto) }}" class="w-full h-full object-cover rounded">
+                                            @else
+                                                <div class="w-full h-full bg-gray-200 rounded flex items-center justify-center">
+                                                    <i class="fas fa-carrot text-gray-400 text-xs"></i>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        <div>
+                                            <p class="font-medium">{{ $ingrediente->nombre }}</p>
+                                            <p class="text-xs text-muted">{{ $ingrediente->unidad_medida }}</p>
+                                        </div>
+                                    </div>
+                                    @endforeach
+                                </div>
                             </div>
+                            <a href="{{ route('ingredientes.create') }}" 
+                               target="_blank" 
+                               class="btn-secondary px-4 inline-flex items-center justify-center"
+                               title="Crear nuevo ingrediente">
+                                <i class="fas fa-plus"></i>
+                            </a>
                         </div>
                         
                         <div class="flex gap-2 mt-2">

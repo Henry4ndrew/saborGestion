@@ -3,6 +3,7 @@
 
 @section('content')
 <div class="max-w-4xl mx-auto" x-data="{ 
+    showImageModal: false, modalImageUrl: '', modalImageTitle: '',
     ingredientesSeleccionados: {{ Js::from($ingredientesSeleccionados) }},
     ingredientesDisponibles: {{ Js::from($ingredientes) }},
     selectedIngrediente: null,
@@ -103,7 +104,10 @@
                             <label class="block text-sm font-medium text-text mb-2">Imagen</label>
                             @if($plato->imagen)
                                 <div class="mb-2">
-                                    <img src="{{ Storage::url($plato->imagen) }}" alt="{{ $plato->nombre }}" class="w-20 h-20 object-cover rounded-lg">
+                                    <img src="{{ Storage::url($plato->imagen) }}" 
+                                         alt="{{ $plato->nombre }}" 
+                                         class="w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-75"
+                                         @click="modalImageUrl = '{{ Storage::url($plato->imagen) }}'; modalImageTitle = '{{ $plato->nombre }}'; showImageModal = true">
                                 </div>
                             @endif
                             <input type="file" name="imagen" accept="image/*" class="w-full">
@@ -135,39 +139,47 @@
                     
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-text mb-2">Agregar Ingrediente</label>
-                        <div class="relative">
-                            <!-- Selector personalizado -->
-                            <div @click="showDropdown = !showDropdown" 
-                                 class="w-full px-4 py-2 rounded-lg border border-border cursor-pointer flex justify-between items-center bg-white">
-                                <span x-text="selectedIngrediente ? selectedIngrediente.nombre : 'Seleccionar ingrediente'"></span>
-                                <i class="fas fa-chevron-down"></i>
-                            </div>
-                            
-                            <!-- Dropdown -->
-                            <div x-show="showDropdown" 
-                                 x-cloak
-                                 @click.away="showDropdown = false"
-                                 class="absolute z-10 w-full mt-1 bg-white border border-border rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                                <template x-for="ingrediente in ingredientesDisponibles" :key="ingrediente.id">
-                                    <div class="p-2 hover:bg-gray-100 cursor-pointer flex items-center space-x-3"
-                                         @click="selectedIngrediente = ingrediente; showDropdown = false">
-                                        <div class="w-8 h-8">
-                                            <template x-if="ingrediente.foto">
-                                                <img :src="'/storage/' + ingrediente.foto" class="w-full h-full object-cover rounded">
-                                            </template>
-                                            <template x-if="!ingrediente.foto">
-                                                <div class="w-full h-full bg-gray-200 rounded flex items-center justify-center">
-                                                    <i class="fas fa-carrot text-gray-400 text-xs"></i>
-                                                </div>
-                                            </template>
+                        <div class="flex gap-2">
+                            <div class="relative flex-1">
+                                <!-- Selector personalizado -->
+                                <div @click="showDropdown = !showDropdown" 
+                                     class="w-full px-4 py-2 rounded-lg border border-border cursor-pointer flex justify-between items-center bg-white">
+                                    <span x-text="selectedIngrediente ? selectedIngrediente.nombre : 'Seleccionar ingrediente'"></span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                
+                                <!-- Dropdown -->
+                                <div x-show="showDropdown" 
+                                     x-cloak
+                                     @click.away="showDropdown = false"
+                                     class="absolute z-10 w-full mt-1 bg-white border border-border rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                    <template x-for="ingrediente in ingredientesDisponibles" :key="ingrediente.id">
+                                        <div class="p-2 hover:bg-gray-100 cursor-pointer flex items-center space-x-3"
+                                             @click="selectedIngrediente = ingrediente; showDropdown = false">
+                                            <div class="w-8 h-8">
+                                                <template x-if="ingrediente.foto">
+                                                    <img :src="'/storage/' + ingrediente.foto" class="w-full h-full object-cover rounded">
+                                                </template>
+                                                <template x-if="!ingrediente.foto">
+                                                    <div class="w-full h-full bg-gray-200 rounded flex items-center justify-center">
+                                                        <i class="fas fa-carrot text-gray-400 text-xs"></i>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                            <div>
+                                                <p class="font-medium" x-text="ingrediente.nombre"></p>
+                                                <p class="text-xs text-muted" x-text="'Unidad: ' + ingrediente.unidad_medida"></p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p class="font-medium" x-text="ingrediente.nombre"></p>
-                                            <p class="text-xs text-muted" x-text="'Unidad: ' + ingrediente.unidad_medida"></p>
-                                        </div>
-                                    </div>
-                                </template>
+                                    </template>
+                                </div>
                             </div>
+                            <a href="{{ route('ingredientes.create') }}" 
+                               target="_blank" 
+                               class="btn-secondary px-4 inline-flex items-center justify-center"
+                               title="Crear nuevo ingrediente">
+                                <i class="fas fa-plus"></i>
+                            </a>
                         </div>
                         
                         <div class="flex gap-2 mt-2">
@@ -252,6 +264,44 @@
                 </div>
             </div>
         </form>
+    </div>
+
+    <!-- Modal de Imagen -->
+    <div x-show="showImageModal" 
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75"
+         x-cloak
+         @keydown.escape.window="showImageModal = false"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        
+        <div class="relative max-w-4xl w-full bg-white rounded-xl overflow-hidden shadow-2xl"
+             @click.away="showImageModal = false"
+             x-transition:enter="transition ease-out duration-300 transform"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-200 transform"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95">
+            
+            <div class="flex items-center justify-between p-4 border-b border-border">
+                <h3 class="text-xl font-bold text-text" x-text="modalImageTitle"></h3>
+                <button @click="showImageModal = false" class="text-muted hover:text-text transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <div class="p-2 bg-gray-50 flex justify-center items-center">
+                <img :src="modalImageUrl" :alt="modalImageTitle" class="max-w-full max-h-[70vh] object-contain rounded-lg shadow-inner">
+            </div>
+            
+            <div class="p-4 flex justify-end">
+                <button @click="showImageModal = false" class="btn-secondary">Cerrar</button>
+            </div>
+        </div>
     </div>
 </div>
 

@@ -18,8 +18,10 @@ class PlatoController extends Controller
         // Filtro por búsqueda
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where('nombre', 'LIKE', "%{$search}%")
+            $query->where(function($q) use ($search) {
+                $q->where('nombre', 'LIKE', "%{$search}%")
                   ->orWhere('descripcion', 'LIKE', "%{$search}%");
+            });
         }
         
         // Filtro por categoría
