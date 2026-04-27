@@ -3,31 +3,26 @@
 
 @section('content')
 <div class="max-w-4xl mx-auto" x-data="{ 
-    selectedIngrediente: null,
     ingredientesSeleccionados: {{ Js::from($ingredientesSeleccionados) }},
     ingredientesDisponibles: {{ Js::from($ingredientes) }},
+    selectedIngrediente: null,
     showDropdown: false,
-    
-    get cantidadSeleccionada() {
-        return this.selectedIngrediente ? this.selectedIngrediente.cantidad : '';
-    },
-    
-    set cantidadSeleccionada(value) {
-        if (this.selectedIngrediente) {
-            this.selectedIngrediente.cantidad = value;
-        }
-    },
+    cantidadIngrediente: '',
     
     agregarIngrediente() {
-        if (this.selectedIngrediente && this.selectedIngrediente.cantidad) {
+        if (this.selectedIngrediente && this.cantidadIngrediente && this.cantidadIngrediente > 0) {
             const existe = this.ingredientesSeleccionados.some(i => i.id === this.selectedIngrediente.id);
             if (!existe) {
                 this.ingredientesSeleccionados.push({
-                    ...this.selectedIngrediente,
-                    cantidad: this.selectedIngrediente.cantidad
+                    id: this.selectedIngrediente.id,
+                    nombre: this.selectedIngrediente.nombre,
+                    foto: this.selectedIngrediente.foto,
+                    unidad: this.selectedIngrediente.unidad_medida,
+                    cantidad: this.cantidadIngrediente
                 });
             }
             this.selectedIngrediente = null;
+            this.cantidadIngrediente = '';
             this.showDropdown = false;
         }
     },
@@ -48,7 +43,7 @@
     </div>
 
     <div class="card">
-        <form action="{{ route('platos.update', $plato) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('platos.update', $plato) }}" method="POST" enctype="multipart/form-data" id="form-editar-plato">
             @csrf
             @method('PUT')
             
@@ -105,18 +100,14 @@
                         </div>
                         
                         <div>
-                            <label class="block text-sm font-medium text-text mb-2">Imagen Actual</label>
+                            <label class="block text-sm font-medium text-text mb-2">Imagen</label>
                             @if($plato->imagen)
-                                <div class="flex items-center space-x-3">
+                                <div class="mb-2">
                                     <img src="{{ Storage::url($plato->imagen) }}" alt="{{ $plato->nombre }}" class="w-20 h-20 object-cover rounded-lg">
-                                    <div class="flex-1">
-                                        <input type="file" name="imagen" accept="image/*" class="w-full">
-                                        <p class="text-xs text-muted mt-1">Dejar vacío para mantener la imagen actual</p>
-                                    </div>
                                 </div>
-                            @else
-                                <input type="file" name="imagen" accept="image/*" class="w-full">
                             @endif
+                            <input type="file" name="imagen" accept="image/*" class="w-full">
+                            <p class="text-xs text-muted mt-1">Dejar vacío para mantener la imagen actual</p>
                             @error('imagen')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
@@ -159,13 +150,7 @@
                                  class="absolute z-10 w-full mt-1 bg-white border border-border rounded-lg shadow-lg max-h-60 overflow-y-auto">
                                 <template x-for="ingrediente in ingredientesDisponibles" :key="ingrediente.id">
                                     <div class="p-2 hover:bg-gray-100 cursor-pointer flex items-center space-x-3"
-                                         @click="selectedIngrediente = {
-                                             id: ingrediente.id,
-                                             nombre: ingrediente.nombre,
-                                             foto: ingrediente.foto,
-                                             unidad: ingrediente.unidad_medida,
-                                             cantidad: ''
-                                         }; showDropdown = false">
+                                         @click="selectedIngrediente = ingrediente; showDropdown = false">
                                         <div class="w-8 h-8">
                                             <template x-if="ingrediente.foto">
                                                 <img :src="'/storage/' + ingrediente.foto" class="w-full h-full object-cover rounded">
@@ -187,13 +172,15 @@
                         
                         <div class="flex gap-2 mt-2">
                             <input type="number" 
-                                   x-model="cantidadSeleccionada"
+                                   x-model="cantidadIngrediente"
                                    placeholder="Cantidad"
                                    step="0.01"
-                                   class="flex-1 px-4 py-2 rounded-lg border border-border">
+                                   :disabled="!selectedIngrediente"
+                                   class="flex-1 px-4 py-2 rounded-lg border border-border focus:outline-none focus:border-primary disabled:bg-gray-100">
                             <button type="button" 
                                     @click="agregarIngrediente()"
-                                    class="btn-primary px-4">
+                                    :disabled="!selectedIngrediente || !cantidadIngrediente"
+                                    class="btn-primary px-4 disabled:opacity-50 disabled:cursor-not-allowed">
                                 <i class="fas fa-plus mr-1"></i> Agregar
                             </button>
                         </div>
@@ -228,14 +215,17 @@
                                 <input type="hidden" :name="'ingredientes[' + index + '][cantidad]'" :value="ingrediente.cantidad">
                                 
                                 <!-- Mostrar cantidad -->
-                                <div class="w-32 px-4 py-2 bg-gray-50 rounded-lg text-center">
-                                    <span x-text="ingrediente.cantidad"></span>
-                                    <span class="text-xs text-muted ml-1" x-text="ingrediente.unidad"></span>
+                                <div class="w-32">
+                                    <input type="number" 
+                                           x-model="ingredientesSeleccionados[index].cantidad"
+                                           step="0.01"
+                                           class="w-full px-3 py-1 border border-border rounded-lg text-center text-sm">
                                 </div>
+                                <span class="text-xs text-muted" x-text="ingrediente.unidad"></span>
                                 
                                 <button type="button" 
                                         @click="eliminarIngrediente(index)"
-                                        class="text-red-600 hover:text-red-800">
+                                        class="text-red-600 hover:text-red-800 ml-2">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>

@@ -1,5 +1,5 @@
 <?php
-
+// database/seeders/IngredienteSeeder.php
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;

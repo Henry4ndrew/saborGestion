@@ -189,17 +189,22 @@
                             </button>
                         </td>
                         <td class="py-3 px-4">
-                            <a href="{{ route('platos.edit', $plato) }}" class="text-primary hover:text-secondary mr-3 transition-colors">
+                        <div class="flex items-center space-x-2">
+                            <a href="{{ route('platos.show', $plato) }}" class="text-blue-600 hover:text-blue-800 transition-colors" title="Ver detalles">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{{ route('platos.edit', $plato) }}" class="text-primary hover:text-secondary transition-colors" title="Editar">
                                 <i class="fas fa-edit"></i>
                             </a>
                             <form action="{{ route('platos.destroy', $plato) }}" method="POST" class="inline">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:text-red-800 transition-colors" onclick="return confirm('¿Estás seguro de eliminar este plato?')">
+                                <button type="submit" class="text-red-600 hover:text-red-800 transition-colors" title="Eliminar" onclick="return confirm('¿Estás seguro de eliminar este plato?')">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </form>
-                        </td>
+                        </div>
+                    </td>
                     </tr>
                     @empty
                     <tr>

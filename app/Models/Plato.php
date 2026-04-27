@@ -1,11 +1,8 @@
 <?php
-// app/Models/Plato.php
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Plato extends Model
 {
@@ -13,32 +10,29 @@ class Plato extends Model
         'nombre',
         'precio',
         'categoria_id',
-        'imagen',
+        'descripcion',
         'disponible',
-        'score',
-        'descripcion'
+        'imagen',
+        'score'
     ];
-
+    
     protected $casts = [
-        'disponible' => 'boolean',
         'precio' => 'decimal:2',
-        'score' => 'decimal:1',
+        'disponible' => 'boolean',
+        'score' => 'decimal:1'
     ];
-
-    public function categoria(): BelongsTo
+    
+    // Relación con categoría
+    public function categoria()
     {
         return $this->belongsTo(Categoria::class);
     }
-
-    public function ingredientes(): BelongsToMany
+    
+    // Relación con ingredientes (pivote con cantidad)
+    public function ingredientes()
     {
         return $this->belongsToMany(Ingrediente::class, 'plato_ingrediente')
                     ->withPivot('cantidad')
                     ->withTimestamps();
-    }
-
-    public function actualizarScore(): void
-    {
-        $this->save();
     }
 }

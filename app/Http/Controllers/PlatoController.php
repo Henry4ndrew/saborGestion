@@ -108,24 +108,24 @@ class PlatoController extends Controller
 
     
     public function edit(Plato $plato)
-    {
-        $categorias = Categoria::where('activo', true)->orderBy('nombre')->get();
-        $ingredientes = Ingrediente::orderBy('nombre')->get();
-        $plato->load('ingredientes');
-        
-        // Preparar los ingredientes seleccionados para Alpine.js
-        $ingredientesSeleccionados = $plato->ingredientes->map(function($ing) {
-            return [
-                'id' => $ing->id,
-                'nombre' => $ing->nombre,
-                'foto' => $ing->foto,
-                'unidad' => $ing->unidad_medida,
-                'cantidad' => (string) $ing->pivot->cantidad
-            ];
-        });
-        
-        return view('platos.edit', compact('plato', 'categorias', 'ingredientes', 'ingredientesSeleccionados'));
-    }
+{
+    $categorias = Categoria::where('activo', true)->orderBy('nombre')->get();
+    $ingredientes = Ingrediente::orderBy('nombre')->get(['id', 'nombre', 'foto', 'unidad_medida']);
+    $plato->load('ingredientes');
+    
+    // Preparar los ingredientes seleccionados con el formato correcto
+    $ingredientesSeleccionados = $plato->ingredientes->map(function($ingrediente) {
+        return [
+            'id' => $ingrediente->id,
+            'nombre' => $ingrediente->nombre,
+            'foto' => $ingrediente->foto,
+            'unidad' => $ingrediente->unidad_medida,
+            'cantidad' => (float) $ingrediente->pivot->cantidad // Asegurar que sea float
+        ];
+    })->values(); // Reindexar el array
+    
+    return view('platos.edit', compact('plato', 'categorias', 'ingredientes', 'ingredientesSeleccionados'));
+}
     
     public function update(Request $request, Plato $plato)
     {
@@ -173,6 +173,33 @@ class PlatoController extends Controller
             ->with('success', 'Plato actualizado exitosamente');
     }
     
+    /**
+     * Mostrar detalle de un plato específico
+     */
+    public function show(Plato $plato)
+    {
+        // Cargar relaciones necesarias
+        $plato->load(['categoria', 'ingredientes']);
+        
+        // Calcular información adicional
+        $totalIngredientes = $plato->ingredientes->count();
+        $costoTotal = $plato->ingredientes->sum(function($ingrediente) {
+            // Si tienes precio por unidad en ingredientes, puedes calcular costo
+            // return $ingrediente->pivot->cantidad * ($ingrediente->precio_unitario ?? 0);
+            return 0; // Placeholder si no hay precios en ingredientes
+        });
+        
+        // Obtener platos relacionados (misma categoría)
+        $platosRelacionados = Plato::where('categoria_id', $plato->categoria_id)
+            ->where('id', '!=', $plato->id)
+            ->where('disponible', true)
+            ->limit(4)
+            ->get();
+        
+        return view('platos.show', compact('plato', 'totalIngredientes', 'costoTotal', 'platosRelacionados'));
+    }
+
+
     public function destroy(Plato $plato)
     {
         // Eliminar imagen asociada
