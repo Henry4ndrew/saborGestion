@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Plato extends Model
 {
@@ -23,13 +25,13 @@ class Plato extends Model
     ];
     
     // Relación con categoría
-    public function categoria()
+    public function categoria(): BelongsTo
     {
         return $this->belongsTo(Categoria::class);
     }
     
     // Relación con ingredientes (pivote con cantidad)
-    public function ingredientes()
+    public function ingredientes(): BelongsToMany
     {
         return $this->belongsToMany(Ingrediente::class, 'plato_ingrediente')
                     ->withPivot('cantidad')
