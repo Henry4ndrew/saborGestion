@@ -36,6 +36,12 @@ class DashboardController extends Controller
         return view('dashboard.cajero.index');
     }
     
+    public function cliente()
+    {
+        $this->authorizeRole('cliente');
+        return view('dashboard.cliente.index');
+    }
+
     private function authorizeRole($role)
     {
         if (Auth::user()->role !== $role && Auth::user()->role !== 'admin') {
