@@ -169,7 +169,7 @@
                 </div>
 
 
-                <div style="display:block;"><!--marcador1 Opaco-->
+                <div style="display:none;"><!--marcador1 Opaco-->
                 <div x-show="open" 
                     x-collapse
                     x-cloak
