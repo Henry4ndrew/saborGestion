@@ -2,7 +2,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-2xl mx-auto">
+<div class="max-w-2xl mx-auto" x-data="{ showImageModal: false, modalImageUrl: '', modalImageTitle: '' }">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold text-primary">Editar Ingrediente: {{ $ingrediente->nombre }}</h1>
         <a href="{{ route('ingredientes.index') }}" class="btn-secondary">
@@ -48,7 +48,9 @@
                     <div class="mt-1 flex items-center space-x-4">
                         <div id="photoPreview" class="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-border overflow-hidden">
                             @if($ingrediente->foto)
-                                <img src="{{ Storage::url($ingrediente->foto) }}" class="w-full h-full object-cover">
+                                <img src="{{ Storage::url($ingrediente->foto) }}" 
+                                     class="w-full h-full object-cover cursor-pointer hover:opacity-75"
+                                     @click="modalImageUrl = '{{ Storage::url($ingrediente->foto) }}'; modalImageTitle = '{{ $ingrediente->nombre }}'; showImageModal = true">
                             @else
                                 <i class="fas fa-camera text-gray-400 text-2xl"></i>
                             @endif
@@ -111,6 +113,44 @@
                 </div>
             </div>
         </form>
+    </div>
+
+    <!-- Modal de Imagen -->
+    <div x-show="showImageModal" 
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75"
+         x-cloak
+         @keydown.escape.window="showImageModal = false"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        
+        <div class="relative max-w-4xl w-full bg-white rounded-xl overflow-hidden shadow-2xl"
+             @click.away="showImageModal = false"
+             x-transition:enter="transition ease-out duration-300 transform"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-200 transform"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95">
+            
+            <div class="flex items-center justify-between p-4 border-b border-border">
+                <h3 class="text-xl font-bold text-text" x-text="modalImageTitle"></h3>
+                <button @click="showImageModal = false" class="text-muted hover:text-text transition-colors">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            
+            <div class="p-2 bg-gray-50 flex justify-center items-center">
+                <img :src="modalImageUrl" :alt="modalImageTitle" class="max-w-full max-h-[70vh] object-contain rounded-lg shadow-inner">
+            </div>
+            
+            <div class="p-4 flex justify-end">
+                <button @click="showImageModal = false" class="btn-secondary">Cerrar</button>
+            </div>
+        </div>
     </div>
 </div>
 
