@@ -3,7 +3,7 @@
     $role = $user ? $user->role : null;
 @endphp
 
-<aside class="bg-primary text-white shadow-xl transition-all duration-300 ease-in-out flex flex-col h-full"
+<aside class="flex flex-col h-full text-white transition-all duration-300 ease-in-out shadow-xl bg-primary"
        :class="{
            'w-72': sidebarExpanded,
            'w-20': !sidebarExpanded && windowWidth >= 1024,
@@ -11,25 +11,25 @@
        }">
 
     <!-- Logo compacto -->
-    <div class="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between">
-        <div class="flex items-center gap-2 sm:gap-3 overflow-hidden">
+    <div class="flex items-center justify-between p-4 border-b sm:p-5 border-white/10">
+        <div class="flex items-center gap-2 overflow-hidden sm:gap-3">
             <div class="flex-shrink-0">
                 <img src="{{ asset('logo.png') }}" alt="SaborGestion Logo"
-                     class="object-contain w-10 h-10 sm:w-12 sm:h-12 rounded-full">
+                     class="object-contain w-10 h-10 rounded-full sm:w-12 sm:h-12">
             </div>
             <div x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)"
                  x-transition:enter="transition ease-out duration-200"
                  x-transition:enter-start="opacity-0 transform -translate-x-4"
                  x-transition:enter-end="opacity-100 transform translate-x-0"
                  class="whitespace-nowrap">
-                <h1 class="text-lg sm:text-xl font-bold text-white">Sabor Gestión</h1>
+                <h1 class="text-lg font-bold text-white sm:text-xl">Sabor Gestión</h1>
                 <p class="text-[10px] sm:text-xs text-white/70">Sistema de Gestión</p>
             </div>
         </div>
     </div>
 
     <!-- Navegación principal -->
-    <nav class="flex-1 overflow-y-auto overflow-x-hidden py-4 sm:py-6 px-2 sm:px-3 custom-scrollbar">
+    <nav class="flex-1 px-2 py-4 overflow-x-hidden overflow-y-auto sm:py-6 sm:px-3 custom-scrollbar">
         <div class="space-y-1">
 
             <!-- Inteligencia de Negocios -->
@@ -56,22 +56,22 @@
                 <button @click="toggle()"
                         class="w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all duration-200 hover:bg-white/10 group">
                     <div class="flex items-center gap-2 sm:gap-3">
-                        <i class="fas fa-chart-line text-white/80 text-base sm:text-lg w-5 group-hover:text-white transition-colors"></i>
+                        <i class="w-5 text-base transition-colors fas fa-chart-line text-white/80 sm:text-lg group-hover:text-white"></i>
                         <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)"
                               x-transition.duration.200
-                              class="text-xs sm:text-sm font-medium text-white/80 group-hover:text-white whitespace-nowrap">
+                              class="text-xs font-medium sm:text-sm text-white/80 group-hover:text-white whitespace-nowrap">
                             Int. de Neg. BI
                         </span>
                     </div>
                     <i x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)"
                        :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"
-                       class="fas text-xs text-white/50 transition-transform duration-200"></i>
+                       class="text-xs transition-transform duration-200 fas text-white/50"></i>
                 </button>
 
                 <div x-show="open"
                      x-collapse
                      x-cloak
-                     class="ml-2 sm:ml-3 mt-1 space-y-1">
+                     class="mt-1 ml-2 space-y-1 sm:ml-3">
                     @if($role == 'admin')
                         <a href="{{ route('dashboard.administrador') }}"
                            class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
@@ -130,22 +130,22 @@
                 <button @click="toggle()"
                         class="w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all duration-200 hover:bg-white/10 group">
                     <div class="flex items-center gap-2 sm:gap-3">
-                        <i class="fas fa-book-open text-white/80 text-base sm:text-lg w-5 group-hover:text-white transition-colors"></i>
+                        <i class="w-5 text-base transition-colors fas fa-book-open text-white/80 sm:text-lg group-hover:text-white"></i>
                         <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)"
                               x-transition.duration.200
-                              class="text-xs sm:text-sm font-medium text-white/80 group-hover:text-white whitespace-nowrap">
+                              class="text-xs font-medium sm:text-sm text-white/80 group-hover:text-white whitespace-nowrap">
                             Catálogo y Menú
                         </span>
                     </div>
                     <i x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)"
                        :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"
-                       class="fas text-xs text-white/50 transition-transform duration-200"></i>
+                       class="text-xs transition-transform duration-200 fas text-white/50"></i>
                 </button>
 
                 <div x-show="open"
                      x-collapse
                      x-cloak
-                     class="ml-2 sm:ml-3 mt-1 space-y-1">
+                     class="mt-1 ml-2 space-y-1 sm:ml-3">
                     <a href="{{ route('platos.index') }}"
                        class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
                         <i class="fas fa-utensils text-[10px] sm:text-xs w-4"></i>
@@ -155,7 +155,7 @@
                 <div x-show="open"
                     x-collapse
                     x-cloak
-                    class="ml-2 sm:ml-3 mt-1 space-y-1">
+                    class="mt-1 ml-2 space-y-1 sm:ml-3">
                     <a href="{{ route('categorias.index') }}"
                     class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
 
@@ -169,11 +169,11 @@
                 </div>
 
 
-                <div style="display:none;"><!--marcador1 Opaco-->
+
                 <div x-show="open"
                     x-collapse
                     x-cloak
-                    class="ml-2 sm:ml-3 mt-1 space-y-1">
+                    class="mt-1 ml-2 space-y-1 sm:ml-3">
                     <a href="{{ route('ingredientes.index') }}"
                     class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
 
@@ -185,7 +185,6 @@
                         </span>
                     </a>
                 </div>
-                </div><!--fin marcador1-->
 
 
 
@@ -211,22 +210,22 @@
                 <button @click="toggle()"
                         class="w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all duration-200 hover:bg-white/10 group">
                     <div class="flex items-center gap-2 sm:gap-3">
-                        <i class="fas fa-chair text-white/80 text-base sm:text-lg w-5 group-hover:text-white transition-colors"></i>
+                        <i class="w-5 text-base transition-colors fas fa-chair text-white/80 sm:text-lg group-hover:text-white"></i>
                         <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)"
                               x-transition.duration.200
-                              class="text-xs sm:text-sm font-medium text-white/80 group-hover:text-white whitespace-nowrap">
+                              class="text-xs font-medium sm:text-sm text-white/80 group-hover:text-white whitespace-nowrap">
                             Gestión de Mesas
                         </span>
                     </div>
                     <i x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)"
                        :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"
-                       class="fas text-xs text-white/50 transition-transform duration-200"></i>
+                       class="text-xs transition-transform duration-200 fas text-white/50"></i>
                 </button>
 
                 <div x-show="open"
                      x-collapse
                      x-cloak
-                     class="ml-2 sm:ml-3 mt-1">
+                     class="mt-1 ml-2 sm:ml-3">
                     <a href="{{ route('mesas.index') }}"
                        class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
                         <i class="fas fa-table text-[10px] sm:text-xs w-4"></i>
@@ -236,77 +235,106 @@
             </div>
             @endif
 
-            <!-- Operaciones -->
-            @if(in_array($role, ['admin', 'cajero']))
-            <div x-data="{
-                open: localStorage.getItem('sidebar_section_operaciones') === 'true',
-                toggle() {
-                    this.open = !this.open;
-                    localStorage.setItem('sidebar_section_operaciones', this.open);
-                }
-            }"
-            x-init="() => {
-                if (localStorage.getItem('sidebar_section_operaciones') === null) {
-                    open = false;
-                    localStorage.setItem('sidebar_section_operaciones', false);
-                }
-            }"
-            class="mb-1">
-                <button @click="toggle()"
-                        class="w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all duration-200 hover:bg-white/10 group">
-                    <div class="flex items-center gap-2 sm:gap-3">
-                        <i class="fas fa-cash-register text-white/80 text-base sm:text-lg w-5 group-hover:text-white transition-colors"></i>
-                        <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)"
-                              x-transition.duration.200
-                              class="text-xs sm:text-sm font-medium text-white/80 group-hover:text-white whitespace-nowrap">
-                            Operaciones
-                        </span>
-                    </div>
-                    <i x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)"
-                       :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"
-                       class="fas text-xs text-white/50 transition-transform duration-200"></i>
-                </button>
 
-                <div x-show="open"
-                     x-collapse
-                     x-cloak
-                     class="ml-2 sm:ml-3 mt-1 space-y-1">
-                    <a href="{{ route('pedidos.index') }}"
-                       class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                        <i class="fas fa-clipboard-list text-[10px] sm:text-xs w-4"></i>
-                        <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Pedidos</span>
-                    </a>
-                    <a href="{{ route('comandas.index') }}"
-                       class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                        <i class="fas fa-receipt text-[10px] sm:text-xs w-4"></i>
-                        <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Comandas</span>
-                    </a>
-                    <a href="{{ route('delivery.index') }}"
-                       class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                        <i class="fas fa-motorcycle text-[10px] sm:text-xs w-4"></i>
-                        <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Delivery</span>
-                    </a>
 
-                    <div class="h-px my-2 bg-white/10"></div>
 
-                    <a href="{{ route('facturas.index') }}"
-                       class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                        <i class="fas fa-file-invoice text-[10px] sm:text-xs w-4"></i>
-                        <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Pre-factura</span>
-                    </a>
-                    <a href="{{ route('pagos.index') }}"
-                       class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                        <i class="fas fa-credit-card text-[10px] sm:text-xs w-4"></i>
-                        <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Pagos</span>
-                    </a>
-                    <a href="{{ route('cierres.index') }}"
-                       class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                        <i class="fas fa-cash-register text-[10px] sm:text-xs w-4"></i>
-                        <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Cierre de Caja</span>
-                    </a>
-                </div>
-            </div>
-            @endif
+
+
+
+
+
+
+<!-- Operaciones -->
+@if(in_array($role, ['admin', 'cajero', 'mesero', 'cocinero']))
+<div x-data="{
+    open: localStorage.getItem('sidebar_section_operaciones') === 'true',
+    toggle() {
+        this.open = !this.open;
+        localStorage.setItem('sidebar_section_operaciones', this.open);
+    }
+}"
+x-init="() => {
+    if (localStorage.getItem('sidebar_section_operaciones') === null) {
+        open = false;
+        localStorage.setItem('sidebar_section_operaciones', false);
+    }
+}"
+class="mb-1">
+    <button @click="toggle()"
+            class="w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all duration-200 hover:bg-white/10 group">
+        <div class="flex items-center gap-2 sm:gap-3">
+            <i class="w-5 text-base transition-colors fas fa-cash-register text-white/80 sm:text-lg group-hover:text-white"></i>
+            <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)"
+                  x-transition.duration.200
+                  class="text-xs font-medium sm:text-sm text-white/80 group-hover:text-white whitespace-nowrap">
+                Operaciones
+            </span>
+        </div>
+        <i x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)"
+           :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"
+           class="text-xs transition-transform duration-200 fas text-white/50"></i>
+    </button>
+
+    <div x-show="open"
+         x-collapse
+         x-cloak
+         class="mt-1 ml-2 space-y-1 sm:ml-3">
+
+        @if(in_array($role, ['admin', 'cajero', 'mesero']))
+        <!-- Pedidos - Ahora visible para mesero también -->
+        <a href="{{ route('pedidos.index') }}"
+           class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
+            <i class="fas fa-clipboard-list text-[10px] sm:text-xs w-4"></i>
+            <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Pedidos</span>
+        </a>
+        @endif
+
+        <!-- Comandas -->
+        @if(in_array($role, ['admin', 'cajero', 'cocinero']))
+        <a href="{{ route('comandas.index') }}"
+        class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
+            <i class="fas fa-receipt text-[10px] sm:text-xs w-4"></i>
+            <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Comandas</span>
+        </a>
+        @endif
+
+        <!-- Delivery - Solo para admin y cajero -->
+        @if(in_array($role, ['admin', 'cajero']))
+        <a href="{{ route('delivery.index') }}"
+           class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
+            <i class="fas fa-motorcycle text-[10px] sm:text-xs w-4"></i>
+            <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Delivery</span>
+        </a>
+        @endif
+
+        <div class="h-px my-2 bg-white/10"></div>
+
+        <!-- Pre-factura - Solo para admin y cajero -->
+        @if(in_array($role, ['admin', 'cajero']))
+        <a href="{{ route('facturas.index') }}"
+           class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
+            <i class="fas fa-file-invoice text-[10px] sm:text-xs w-4"></i>
+            <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Pre-factura</span>
+        </a>
+
+        <!-- Pagos - Solo para admin y cajero -->
+        <a href="{{ route('pagos.index') }}"
+           class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
+            <i class="fas fa-credit-card text-[10px] sm:text-xs w-4"></i>
+            <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Pagos</span>
+        </a>
+
+        <!-- Cierre de Caja - Solo para admin y cajero -->
+        <a href="{{ route('cierres.index') }}"
+           class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
+            <i class="fas fa-cash-register text-[10px] sm:text-xs w-4"></i>
+            <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Cierre de Caja</span>
+        </a>
+        @endif
+    </div>
+</div>
+@endif
+
 
             <!-- Administración -->
             @if($role == 'admin')
@@ -327,22 +355,22 @@
                 <button @click="toggle()"
                         class="w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all duration-200 hover:bg-white/10 group">
                     <div class="flex items-center gap-2 sm:gap-3">
-                        <i class="fas fa-user-shield text-white/80 text-base sm:text-lg w-5 group-hover:text-white transition-colors"></i>
+                        <i class="w-5 text-base transition-colors fas fa-user-shield text-white/80 sm:text-lg group-hover:text-white"></i>
                         <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)"
                               x-transition.duration.200
-                              class="text-xs sm:text-sm font-medium text-white/80 group-hover:text-white whitespace-nowrap">
+                              class="text-xs font-medium sm:text-sm text-white/80 group-hover:text-white whitespace-nowrap">
                             Administración
                         </span>
                     </div>
                     <i x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)"
                        :class="open ? 'fa-chevron-up' : 'fa-chevron-down'"
-                       class="fas text-xs text-white/50 transition-transform duration-200"></i>
+                       class="text-xs transition-transform duration-200 fas text-white/50"></i>
                 </button>
 
                 <div x-show="open"
                      x-collapse
                      x-cloak
-                     class="ml-2 sm:ml-3 mt-1">
+                     class="mt-1 ml-2 sm:ml-3">
                     <a href="{{ route('usuarios.index') }}"
                        class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
                         <i class="fas fa-users text-[10px] sm:text-xs w-4"></i>

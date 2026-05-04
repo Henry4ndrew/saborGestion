@@ -44,11 +44,15 @@ Route::middleware(['auth'])->group(function () {
     // Mesas
     Route::resource('mesas', MesaController::class)->middleware('role:admin,mesero');
     
-    // Pedidos
-    Route::resource('pedidos', PedidoController::class)->middleware('role:admin,cajero');
-    
-    // Comandas
-    Route::resource('comandas', ComandaController::class)->middleware('role:admin,cajero');
+
+    // Comandas (Cocina)
+    Route::prefix('comandas')->name('comandas.')->middleware('role:admin,cocinero')->group(function () {
+        Route::get('/', [ComandaController::class, 'index'])->name('index');
+        Route::post('/{comanda}/iniciar-preparacion', [ComandaController::class, 'iniciarPreparacion'])->name('iniciar-preparacion');
+        Route::post('/{comanda}/marcar-listo', [ComandaController::class, 'marcarListo'])->name('marcar-listo');
+        Route::post('/detalle/{detalle}/actualizar', [ComandaController::class, 'actualizarDetalle'])->name('actualizar-detalle');
+        Route::get('/{comanda}/print', [ComandaController::class, 'print'])->name('print');
+    });
     
     // Delivery
     Route::resource('delivery', DeliveryController::class)->middleware('role:admin,cajero');
@@ -73,6 +77,19 @@ Route::middleware(['auth'])->group(function () {
 
     // Usuarios
     Route::resource('usuarios', UsuarioController::class)->middleware('role:admin');
+
+
+
+   //PEDIDOS
+    Route::resource('pedidos', PedidoController::class)->middleware('role:admin,mesero,cajero');
+    Route::post('/pedidos/{pedido}/cambiar-estado', [PedidoController::class, 'cambiarEstado'])
+        ->name('pedidos.cambiar-estado')
+        ->middleware('role:admin,mesero,cocinero');
+    Route::post('/detalle-pedido/{detalle}/cambiar-estado', [PedidoController::class, 'cambiarEstadoDetalle'])
+        ->name('pedidos.detalle.cambiar-estado')
+        ->middleware('role:admin,cocinero');
+    Route::get('/pedidos/{pedido}/imprimir', [PedidoController::class, 'imprimir'])
+        ->name('pedidos.imprimir');
 });
 
 require __DIR__.'/auth.php';

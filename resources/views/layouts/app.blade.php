@@ -11,10 +11,11 @@
 
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    @stack('styles')
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="antialiased bg-gray-50 overflow-hidden">
+<body class="overflow-hidden antialiased bg-gray-50">
     <div x-data="appLayout()"
          x-init="init()"
          class="relative h-screen overflow-hidden">
@@ -46,31 +47,31 @@
             </div>
 
             <!-- Contenido Principal -->
-            <div class="flex-1 flex flex-col min-w-0 overflow-hidden"
+            <div class="flex flex-col flex-1 min-w-0 overflow-hidden"
                  :class="{
                      'lg:ml-0': true,
                      'ml-0': true
                  }">
 
                 <!-- Navbar Superior con Perfil y Logout -->
-                <nav class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10">
-                    <div class="px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-between">
+                <nav class="sticky top-0 z-10 bg-white border-b border-gray-200 shadow-sm">
+                    <div class="flex items-center justify-between px-3 py-2 sm:px-6 sm:py-3">
                         <!-- Sección izquierda: Botón hamburguesa + Datos usuario -->
                         <div class="flex items-center gap-2 sm:gap-3">
                             <!-- Botón hamburguesa para móvil -->
                             <button @click="toggleMobileSidebar()"
                                     class="p-1.5 sm:p-2 -ml-1.5 sm:-ml-2 rounded-lg lg:hidden hover:bg-gray-100 transition-colors">
-                                <i class="fas fa-bars text-gray-600 text-lg sm:text-xl"></i>
+                                <i class="text-lg text-gray-600 fas fa-bars sm:text-xl"></i>
                             </button>
 
                             <!-- Datos del Usuario (siempre visibles) -->
                             <div class="flex items-center gap-2 sm:gap-3">
-                                <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-primary bg-opacity-10 flex items-center justify-center">
-                                    <i class="fas fa-user-alt text-primary text-xs sm:text-sm"></i>
+                                <div class="flex items-center justify-center rounded-lg w-7 h-7 sm:w-8 sm:h-8 bg-primary bg-opacity-10">
+                                    <i class="text-xs fas fa-user-alt text-primary sm:text-sm"></i>
                                 </div>
 
                                 <div class="text-left">
-                                    <p class="text-xs sm:text-sm font-medium text-gray-700">
+                                    <p class="text-xs font-medium text-gray-700 sm:text-sm">
                                         {{ Auth::user()->name }}
                                     </p>
                                     <p class="text-[10px] sm:text-xs text-gray-500 hidden xs:block">
@@ -85,7 +86,7 @@
                             @csrf
                             <button type="submit"
                                     class="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors whitespace-nowrap">
-                                <i class="fas fa-sign-out-alt text-red-500 text-sm sm:text-base"></i>
+                                <i class="text-sm text-red-500 fas fa-sign-out-alt sm:text-base"></i>
                                 <span class="text-xs sm:text-sm">Cerrar Sesión</span>
                             </button>
                         </form>
@@ -94,7 +95,7 @@
 
                 <!-- Contenido Principal -->
                 <main class="flex-1 overflow-y-auto bg-gray-50">
-                    <div class="container mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
+                    <div class="container px-3 py-4 mx-auto sm:px-4 lg:px-6 sm:py-6">
 
 
 
@@ -122,15 +123,15 @@
                         @if(isset($breadcrumbs))
                             <!-- Breadcrumbs opcional -->
                             <div class="mb-4">
-                                <nav class="flex items-center gap-2 text-sm overflow-x-auto">
+                                <nav class="flex items-center gap-2 overflow-x-auto text-sm">
                                     @foreach($breadcrumbs as $crumb)
                                         @if(!$loop->last)
-                                            <a href="{{ $crumb['url'] }}" class="text-gray-500 hover:text-primary transition-colors whitespace-nowrap">
+                                            <a href="{{ $crumb['url'] }}" class="text-gray-500 transition-colors hover:text-primary whitespace-nowrap">
                                                 {{ $crumb['label'] }}
                                             </a>
-                                            <i class="fas fa-chevron-right text-xs text-gray-400 flex-shrink-0"></i>
+                                            <i class="flex-shrink-0 text-xs text-gray-400 fas fa-chevron-right"></i>
                                         @else
-                                            <span class="text-gray-800 font-medium whitespace-nowrap">{{ $crumb['label'] }}</span>
+                                            <span class="font-medium text-gray-800 whitespace-nowrap">{{ $crumb['label'] }}</span>
                                         @endif
                                     @endforeach
                                 </nav>
@@ -143,6 +144,28 @@
             </div>
         </div>
     </div>
+
+
+
+    <style>
+        @keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+}
+ </style>
+
+
+
 
     <script>
         function appLayout() {
@@ -185,5 +208,6 @@
             }
         }
     </script>
+    @stack('scripts')
 </body>
 </html>
