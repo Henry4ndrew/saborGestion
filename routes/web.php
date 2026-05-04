@@ -44,8 +44,15 @@ Route::middleware(['auth'])->group(function () {
     // Mesas
     Route::resource('mesas', MesaController::class)->middleware('role:admin,mesero');
     
-    // Comandas
-    Route::resource('comandas', ComandaController::class)->middleware('role:admin,cajero');
+
+    // Comandas (Cocina)
+    Route::prefix('comandas')->name('comandas.')->middleware('role:admin,cocinero')->group(function () {
+        Route::get('/', [ComandaController::class, 'index'])->name('index');
+        Route::post('/{comanda}/iniciar-preparacion', [ComandaController::class, 'iniciarPreparacion'])->name('iniciar-preparacion');
+        Route::post('/{comanda}/marcar-listo', [ComandaController::class, 'marcarListo'])->name('marcar-listo');
+        Route::post('/detalle/{detalle}/actualizar', [ComandaController::class, 'actualizarDetalle'])->name('actualizar-detalle');
+        Route::get('/{comanda}/print', [ComandaController::class, 'print'])->name('print');
+    });
     
     // Delivery
     Route::resource('delivery', DeliveryController::class)->middleware('role:admin,cajero');
