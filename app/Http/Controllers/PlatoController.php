@@ -178,18 +178,11 @@ class PlatoController extends Controller
      */
     public function show(Plato $plato)
     {
-        // Cargar relaciones necesarias
         $plato->load(['categoria', 'ingredientes']);
-        
-        // Calcular información adicional
         $totalIngredientes = $plato->ingredientes->count();
         $costoTotal = $plato->ingredientes->sum(function($ingrediente) {
-            // Si tienes precio por unidad en ingredientes, puedes calcular costo
-            // return $ingrediente->pivot->cantidad * ($ingrediente->precio_unitario ?? 0);
-            return 0; // Placeholder si no hay precios en ingredientes
+            return 0;
         });
-        
-        // Obtener platos relacionados (misma categoría)
         $platosRelacionados = Plato::where('categoria_id', $plato->categoria_id)
             ->where('id', '!=', $plato->id)
             ->where('disponible', true)

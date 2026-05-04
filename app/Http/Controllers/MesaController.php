@@ -1,5 +1,5 @@
 <?php
-
+// app/Http/Controllers/MesaController.php
 namespace App\Http\Controllers;
 
 use App\Models\Mesa;

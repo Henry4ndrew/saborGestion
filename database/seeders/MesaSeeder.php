@@ -1,5 +1,5 @@
 <?php
-
+// database/seeders/MesaSeeder.php
 namespace Database\Seeders;
 
 use App\Models\Mesa;

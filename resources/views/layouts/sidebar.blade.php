@@ -169,7 +169,7 @@
                 </div>
 
 
-                <div style="display:none;"><!--marcador1 Opaco-->
+    
                 <div x-show="open" 
                     x-collapse
                     x-cloak
@@ -185,7 +185,6 @@
                         </span>
                     </a>
                 </div>
-                </div><!--fin marcador1-->
 
 
                 
@@ -236,77 +235,103 @@
             </div>
             @endif
 
-            <!-- Operaciones -->
-            @if(in_array($role, ['admin', 'cajero']))
-            <div x-data="{ 
-                open: localStorage.getItem('sidebar_section_operaciones') === 'true',
-                toggle() {
-                    this.open = !this.open;
-                    localStorage.setItem('sidebar_section_operaciones', this.open);
-                }
-            }"
-            x-init="() => {
-                if (localStorage.getItem('sidebar_section_operaciones') === null) {
-                    open = false;
-                    localStorage.setItem('sidebar_section_operaciones', false);
-                }
-            }"
-            class="mb-1">
-                <button @click="toggle()" 
-                        class="w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all duration-200 hover:bg-white/10 group">
-                    <div class="flex items-center gap-2 sm:gap-3">
-                        <i class="fas fa-cash-register text-white/80 text-base sm:text-lg w-5 group-hover:text-white transition-colors"></i>
-                        <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" 
-                              x-transition.duration.200 
-                              class="text-xs sm:text-sm font-medium text-white/80 group-hover:text-white whitespace-nowrap">
-                            Operaciones
-                        </span>
-                    </div>
-                    <i x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" 
-                       :class="open ? 'fa-chevron-up' : 'fa-chevron-down'" 
-                       class="fas text-xs text-white/50 transition-transform duration-200"></i>
-                </button>
-                
-                <div x-show="open" 
-                     x-collapse
-                     x-cloak
-                     class="ml-2 sm:ml-3 mt-1 space-y-1">
-                    <a href="{{ route('pedidos.index') }}" 
-                       class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                        <i class="fas fa-clipboard-list text-[10px] sm:text-xs w-4"></i>
-                        <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Pedidos</span>
-                    </a>
-                    <a href="{{ route('comandas.index') }}" 
-                       class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                        <i class="fas fa-receipt text-[10px] sm:text-xs w-4"></i>
-                        <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Comandas</span>
-                    </a>
-                    <a href="{{ route('delivery.index') }}" 
-                       class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                        <i class="fas fa-motorcycle text-[10px] sm:text-xs w-4"></i>
-                        <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Delivery</span>
-                    </a>
-                    
-                    <div class="h-px bg-white/10 my-2"></div>
-                    
-                    <a href="{{ route('facturas.index') }}" 
-                       class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                        <i class="fas fa-file-invoice text-[10px] sm:text-xs w-4"></i>
-                        <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Pre-factura</span>
-                    </a>
-                    <a href="{{ route('pagos.index') }}" 
-                       class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                        <i class="fas fa-credit-card text-[10px] sm:text-xs w-4"></i>
-                        <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Pagos</span>
-                    </a>
-                    <a href="{{ route('cierres.index') }}" 
-                       class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
-                        <i class="fas fa-cash-register text-[10px] sm:text-xs w-4"></i>
-                        <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Cierre de Caja</span>
-                    </a>
-                </div>
-            </div>
-            @endif
+
+
+
+
+
+
+
+
+ 
+<!-- Operaciones -->
+@if(in_array($role, ['admin', 'cajero', 'mesero']))
+<div x-data="{ 
+    open: localStorage.getItem('sidebar_section_operaciones') === 'true',
+    toggle() {
+        this.open = !this.open;
+        localStorage.setItem('sidebar_section_operaciones', this.open);
+    }
+}"
+x-init="() => {
+    if (localStorage.getItem('sidebar_section_operaciones') === null) {
+        open = false;
+        localStorage.setItem('sidebar_section_operaciones', false);
+    }
+}"
+class="mb-1">
+    <button @click="toggle()" 
+            class="w-full flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg transition-all duration-200 hover:bg-white/10 group">
+        <div class="flex items-center gap-2 sm:gap-3">
+            <i class="fas fa-cash-register text-white/80 text-base sm:text-lg w-5 group-hover:text-white transition-colors"></i>
+            <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" 
+                  x-transition.duration.200 
+                  class="text-xs sm:text-sm font-medium text-white/80 group-hover:text-white whitespace-nowrap">
+                Operaciones
+            </span>
+        </div>
+        <i x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" 
+           :class="open ? 'fa-chevron-up' : 'fa-chevron-down'" 
+           class="fas text-xs text-white/50 transition-transform duration-200"></i>
+    </button>
+    
+    <div x-show="open" 
+         x-collapse
+         x-cloak
+         class="ml-2 sm:ml-3 mt-1 space-y-1">
+        <!-- Pedidos - Ahora visible para mesero también -->
+        <a href="{{ route('pedidos.index') }}" 
+           class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
+            <i class="fas fa-clipboard-list text-[10px] sm:text-xs w-4"></i>
+            <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Pedidos</span>
+        </a>
+        
+        <!-- Comandas - Solo para admin y cajero -->
+        @if(in_array($role, ['admin', 'cajero']))
+        <a href="{{ route('comandas.index') }}" 
+           class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
+            <i class="fas fa-receipt text-[10px] sm:text-xs w-4"></i>
+            <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Comandas</span>
+        </a>
+        @endif
+        
+        <!-- Delivery - Solo para admin y cajero -->
+        @if(in_array($role, ['admin', 'cajero']))
+        <a href="{{ route('delivery.index') }}" 
+           class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
+            <i class="fas fa-motorcycle text-[10px] sm:text-xs w-4"></i>
+            <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Delivery</span>
+        </a>
+        @endif
+        
+        <div class="h-px bg-white/10 my-2"></div>
+        
+        <!-- Pre-factura - Solo para admin y cajero -->
+        @if(in_array($role, ['admin', 'cajero']))
+        <a href="{{ route('facturas.index') }}" 
+           class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
+            <i class="fas fa-file-invoice text-[10px] sm:text-xs w-4"></i>
+            <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Pre-factura</span>
+        </a>
+        
+        <!-- Pagos - Solo para admin y cajero -->
+        <a href="{{ route('pagos.index') }}" 
+           class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
+            <i class="fas fa-credit-card text-[10px] sm:text-xs w-4"></i>
+            <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Pagos</span>
+        </a>
+        
+        <!-- Cierre de Caja - Solo para admin y cajero -->
+        <a href="{{ route('cierres.index') }}" 
+           class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
+            <i class="fas fa-cash-register text-[10px] sm:text-xs w-4"></i>
+            <span x-show="sidebarExpanded || (windowWidth < 1024 && mobileSidebarOpen)" class="whitespace-nowrap">Cierre de Caja</span>
+        </a>
+        @endif
+    </div>
+</div>
+@endif
+
 
             <!-- Administración -->
             @if($role == 'admin')
