@@ -101,6 +101,9 @@ Route::middleware(['auth'])->group(function () {
 
     //inventario
     Route::resource('inventario', InventarioController::class)->middleware('role:admin,cocinero');
+    Route::post('/inventario/reponer-producto', [InventarioController::class, 'reponerPorProducto'])
+        ->name('inventario.reponer-producto')
+        ->middleware('role:admin,cocinero');
 
     // Usuarios
     Route::resource('usuarios', UsuarioController::class)->middleware('role:admin');
