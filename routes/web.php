@@ -170,8 +170,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/misPedidosPendientes', [PedidoController::class, 'misPedidosPendientes'])
     ->name('pedidos.pendientes.json');
 
-    Route::get('/misPedidosPendientes', [PedidoController::class, 'misPedidosPendientes'])
-    ->name('pedidos.pendientes.json');
 
     Route::get('/cliente/pedidos/{pedido}/generar-qr', [PedidoController::class, 'generarQrPedido'])
     ->name('cliente.pedido.generar-qr');
@@ -215,9 +213,7 @@ Route::middleware(['auth', 'role:cajero,admin'])->prefix('cierres')->name('caja.
 Route::middleware(['role:admin'])->group(function () {
     Route::get('/admin/analytics', [App\Http\Controllers\AdminAnalyticsController::class, 'index'])
         ->name('admin.analytics');
-    Route::get('/mesero/refresh-data', [App\Http\Controllers\ServerDashboardController::class, 'refreshData'])
-    ->name('mesero.refresh-data')
-    ->middleware('auth', 'role:mesero');
+
 });
 
 
