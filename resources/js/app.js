@@ -214,6 +214,111 @@ function mostrarToastPago(titulo, pago) {
 }
 
 /**
+ * Toast especializado para pedidos listos para entregar.
+ * Muestra número de pedido, mesa y hora de finalización.
+ */
+function mostrarToastPedidoListo(numeroPedido, mesaNumero, tiempoFinalizacion) {
+    let stack = document.getElementById('toast-stack-pedidos');
+    if (!stack) {
+        stack = document.createElement('div');
+        stack.id = 'toast-stack-pedidos';
+        stack.style.cssText = `position: fixed; top: 90px; right: 20px; z-index: 9999; display:flex; flex-direction:column; gap:12px; pointer-events:none;`;
+        document.body.appendChild(stack);
+    }
+
+    const mesaInfo = mesaNumero && mesaNumero !== 'N/A' ? `Mesa ${mesaNumero}` : 'Mostrador';
+    const detalles = [numeroPedido, mesaInfo, tiempoFinalizacion].filter(Boolean).join(' • ');
+
+    const toast = document.createElement('div');
+    toast.style.cssText = `background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 16px 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4); min-width: 320px; max-width: 400px; display: flex; align-items: center; gap: 14px; transform: translateX(120%); opacity: 0; transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s; pointer-events: auto; cursor: pointer; font-family: inherit;`;
+
+    toast.innerHTML = `
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; animation: pulseRing 1.5s infinite;">
+            <i class="fas fa-check-circle" style="font-size: 22px;"></i>
+        </div>
+        <div style="flex: 1; min-width: 0;">
+            <div style="font-weight: 700; font-size: 15px; margin-bottom: 2px;">
+                ✅ ¡Pedido Listo!
+            </div>
+            <div style="font-size: 13px; opacity: 0.95;">
+                ${detalles}
+            </div>
+        </div>
+        <button style="background: rgba(255, 255, 255, 0.2); border: none; color: white; width: 28px; height: 28px; border-radius: 50%; font-size: 16px; cursor: pointer; flex-shrink: 0;" title="Cerrar">×</button>
+    `;
+
+    stack.appendChild(toast);
+    requestAnimationFrame(() => {
+        toast.style.transform = 'translateX(0)';
+        toast.style.opacity = '1';
+    });
+
+    const dismiss = () => {
+        toast.style.transform = 'translateX(120%)';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 500);
+    };
+
+    const timer = setTimeout(dismiss, 5000);
+    toast.addEventListener('click', () => {
+        clearTimeout(timer);
+        dismiss();
+    });
+}
+
+/**
+ * Toast para notificar que una mesa fue liberada.
+ * Muestra número de mesa y estado.
+ */
+function mostrarToastMesaLiberada(numeroMesa) {
+    let stack = document.getElementById('toast-stack-pedidos');
+    if (!stack) {
+        stack = document.createElement('div');
+        stack.id = 'toast-stack-pedidos';
+        stack.style.cssText = `position: fixed; top: 90px; right: 20px; z-index: 9999; display:flex; flex-direction:column; gap:12px; pointer-events:none;`;
+        document.body.appendChild(stack);
+    }
+
+    const toast = document.createElement('div');
+    toast.style.cssText = `background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; padding: 16px 20px; border-radius: 12px; box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4); min-width: 320px; max-width: 400px; display: flex; align-items: center; gap: 14px; transform: translateX(120%); opacity: 0; transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s; pointer-events: auto; cursor: pointer; font-family: inherit;`;
+
+    toast.innerHTML = `
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+            <i class="fas fa-chair" style="font-size: 22px;"></i>
+        </div>
+        <div style="flex: 1; min-width: 0;">
+            <div style="font-weight: 700; font-size: 15px; margin-bottom: 2px;">
+                🪑 Mesa Liberada
+            </div>
+            <div style="font-size: 13px; opacity: 0.95;">
+                Mesa ${numeroMesa} disponible para nuevos clientes
+            </div>
+        </div>
+        <button style="background: rgba(255, 255, 255, 0.2); border: none; color: white; width: 28px; height: 28px; border-radius: 50%; font-size: 16px; cursor: pointer; flex-shrink: 0;" title="Cerrar">×</button>
+    `;
+
+    stack.appendChild(toast);
+    requestAnimationFrame(() => {
+        toast.style.transform = 'translateX(0)';
+        toast.style.opacity = '1';
+    });
+
+    const dismiss = () => {
+        toast.style.transform = 'translateX(120%)';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 500);
+    };
+
+    const timer = setTimeout(dismiss, 4000);
+    toast.addEventListener('click', () => {
+        clearTimeout(timer);
+        dismiss();
+    });
+}
+
+
+
+/**
  * Reproduce un beep simple sin necesidad de archivos de audio.
  * Usa Web Audio API — funciona en cualquier navegador moderno.
  */
@@ -296,15 +401,31 @@ document.addEventListener('DOMContentLoaded', () => {
             .listen('.pedido.estado.cambiado', (e) => {
                 if (e.estado !== 'listo') return; // solo nos interesa "listo"
                 console.log('🍽️ Pedido listo para entregar', e);
-                mostrarToastEstadoPedido(e.numero_pedido, 'listo', 'Pedido listo, retirar de cocina');
+
+                // Crear notificación mejorada con detalles
+                const mesaInfo = e.mesa_numero && e.mesa_numero !== 'N/A' ? ` - Mesa ${e.mesa_numero}` : '';
+                const mensaje = `Pedido #${e.numero_pedido}${mesaInfo}${e.tiempo_finalizacion ? ' - ' + e.tiempo_finalizacion : ''}`;
+                mostrarToastPedidoListo(e.numero_pedido, e.mesa_numero, e.tiempo_finalizacion);
+
                 beep(1100, 250);
                 if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-                    new Notification('🔔 Pedido listo para entregar', {
-                        body: e.numero_pedido ? `${e.numero_pedido} esperando ser entregado` : '',
+                    new Notification('✅ Pedido Listo', {
+                        body: mensaje,
                         icon: '/favicon.ico',
-                        tag: 'mesero-listo-' + e.pedido_id,
+                        tag: 'mesero-listo-' + e.numero_pedido,
                     });
                 }
+
+                // Disparar evento personalizado para que el dashboard lo escuche
+                window.dispatchEvent(new CustomEvent('pedido-listo', {
+                    detail: {
+                        numero_pedido: e.numero_pedido,
+                        mesa_numero: e.mesa_numero,
+                        mesa_zona: e.mesa_zona,
+                        tiempo_finalizacion: e.tiempo_finalizacion,
+                        usuario_id: e.usuario_id
+                    }
+                }));
             })
             .listen('.cuenta.pagada', (e) => {
                 console.log('💰 Cuenta pagada/cerrada', e);
@@ -318,6 +439,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     setTimeout(() => window.location.reload(), 1500);
                 }
                 window.dispatchEvent(new CustomEvent('cuenta-pagada', { detail: e }));
+            })
+            .listen('.mesa.estado.cambiado', (e) => {
+                console.log('🪑 Mesa cambió de estado', e);
+                if (e.estado === 'libre') {
+                    mostrarToastMesaLiberada(e.numero_mesa);
+                    beep(800, 150);
+
+                    // Disparar evento personalizado para que dashboards lo escuchen
+                    window.dispatchEvent(new CustomEvent('mesa-liberada', {
+                        detail: {
+                            mesa_id: e.mesa_id,
+                            numero_mesa: e.numero_mesa,
+                            estado: e.estado
+                        }
+                    }));
+                }
             })
             .error((err) => console.error('❌ Error en pedidos.meseros:', err));
     }

@@ -12,50 +12,58 @@ class ReporteConsumoController extends Controller
     public function index(Request $request)
     {
         $query = Consumo::with('usuario');
-        
+
+        // 🔥 NEW: Only include invoiced and paid orders
+        $query->whereHas('pedido', function ($q) {
+            $q->where('estado', 'facturado')
+              ->whereHas('factura', function ($q2) {
+                  $q2->where('estado', 'pagada');
+              });
+        });
+
         // Filtros
         if ($request->filled('fecha_desde')) {
             $query->whereDate('fecha_consumo', '>=', $request->fecha_desde);
         }
-        
+
         if ($request->filled('fecha_hasta')) {
             $query->whereDate('fecha_consumo', '<=', $request->fecha_hasta);
         }
-        
+
         if ($request->filled('tipo_pedido')) {
             $query->where('tipo_pedido', $request->tipo_pedido);
         }
-        
+
         if ($request->filled('usuario_id')) {
             $query->where('usuario_id', $request->usuario_id);
         }
-        
+
         $consumos = $query->orderBy('fecha_consumo', 'desc')->paginate(15);
-        
-        // Estadísticas
+
+        // Estadísticas (automatically respect the same filter)
         $stats = [
             'total_consumos' => $query->count(),
             'total_ingresos' => $query->sum('total'),
             'total_platos_vendidos' => $this->getTotalPlatosVendidos($query->get()),
             'promedio_por_consumo' => $query->avg('total') ?? 0,
         ];
-        
+
         // Tipo de pedido
         $tipoStats = [
             'mesa' => $query->clone()->where('tipo_pedido', 'mesa')->sum('total'),
             'delivery' => $query->clone()->where('tipo_pedido', 'delivery')->sum('total'),
             'para_llevar' => $query->clone()->where('tipo_pedido', 'para_llevar')->sum('total'),
         ];
-        
+
         // Top platos más vendidos
         $topPlatos = $this->getTopPlatos($query->get());
-        
+
         $usuarios = User::whereIn('role', ['admin', 'cocinero', 'mesero'])->get();
         $tiposPedido = ['mesa' => 'Mesa', 'delivery' => 'Delivery', 'para_llevar' => 'Para Llevar'];
-        
+
         return view('reportes.consumos', compact('consumos', 'stats', 'tipoStats', 'topPlatos', 'usuarios', 'tiposPedido'));
     }
-    
+
     private function getTotalPlatosVendidos($consumos)
     {
         $total = 0;
@@ -66,7 +74,7 @@ class ReporteConsumoController extends Controller
         }
         return $total;
     }
-    
+
     private function getTopPlatos($consumos, $limit = 5)
     {
         $platos = [];
@@ -84,36 +92,43 @@ class ReporteConsumoController extends Controller
                 $platos[$nombre]['total'] += $detalle['subtotal'];
             }
         }
-        
+
         // Ordenar por cantidad
         usort($platos, function($a, $b) {
             return $b['cantidad'] <=> $a['cantidad'];
         });
-        
+
         return array_slice($platos, 0, $limit);
     }
-    
+
     public function export(Request $request)
     {
-        // Para exportar a Excel/CSV (opcional)
         $query = Consumo::with('usuario');
-        
+
+        // 🔥 NEW: Same filter for export – only invoiced and paid orders
+        $query->whereHas('pedido', function ($q) {
+            $q->where('estado', 'facturado')
+              ->whereHas('factura', function ($q2) {
+                  $q2->where('estado', 'pagada');
+              });
+        });
+
         if ($request->filled('fecha_desde')) {
             $query->whereDate('fecha_consumo', '>=', $request->fecha_desde);
         }
-        
+
         if ($request->filled('fecha_hasta')) {
             $query->whereDate('fecha_consumo', '<=', $request->fecha_hasta);
         }
-        
+
         $consumos = $query->orderBy('fecha_consumo', 'desc')->get();
-        
+
         $filename = 'reporte_consumos_' . now()->format('Y-m-d_H-i-s') . '.csv';
         $handle = fopen('php://temp', 'w');
-        
+
         // Cabeceras
         fputcsv($handle, ['N° Pedido', 'Tipo', 'Usuario', 'Fecha', 'Subtotal', 'Descuento', 'Total']);
-        
+
         foreach ($consumos as $consumo) {
             fputcsv($handle, [
                 $consumo->numero_pedido,
@@ -125,11 +140,11 @@ class ReporteConsumoController extends Controller
                 $consumo->total
             ]);
         }
-        
+
         rewind($handle);
         $csv = stream_get_contents($handle);
         fclose($handle);
-        
+
         return response($csv, 200)
             ->header('Content-Type', 'text/csv')
             ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');

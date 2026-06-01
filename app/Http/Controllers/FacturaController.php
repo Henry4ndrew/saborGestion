@@ -118,6 +118,8 @@ class FacturaController extends Controller
 
         if ($factura->pedido) {
             $factura->pedido->update(['estado' => Pedido::ESTADO_FACTURADO]);
+            // Liberar mesa automáticamente si todos los pedidos de la mesa están pagados
+            $factura->pedido->liberarMesaAlPagar();
         }
 
         // Avisar en vivo (mesero/cajero/admin) que esta cuenta se pagó (tu mejora).

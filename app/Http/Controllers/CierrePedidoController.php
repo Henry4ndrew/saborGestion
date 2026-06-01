@@ -157,6 +157,13 @@ class CierrePedidoController extends Controller
 
             DB::commit();
 
+            // Emitir evento de cambio de estado de mesa para propagar en tiempo real
+            try {
+                broadcast(new \App\Events\MesaEstadoCambiado($cierre, 'ocupado'));
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('No se pudo emitir MesaEstadoCambiado (cierre): ' . $e->getMessage());
+            }
+
             // Después del commit: enviar la factura por correo solo a las
             // facturas que pagamos en este cierre (no a las que ya estaban
             // pagadas por un pago QR previo, que ya enviaron su correo).

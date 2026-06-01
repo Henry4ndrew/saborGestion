@@ -62,6 +62,11 @@ class PagoQrController extends Controller
         $factura->estado = Factura::ESTADO_PAGADA;
         $factura->save();
 
+        // Liberar mesa automáticamente si todos los pedidos de la mesa están pagados
+        if ($factura->pedido) {
+            $factura->pedido->liberarMesaAlPagar();
+        }
+
         // FIX: NO movemos el pedido a 'facturado' acá. Si lo hacemos, cocina
         // pierde de vista el pedido (ComandaController filtra por
         // pendiente/en_preparacion/listo) y nunca lo cocina.

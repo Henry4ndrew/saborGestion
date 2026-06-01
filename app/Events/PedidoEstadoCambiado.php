@@ -55,6 +55,10 @@ class PedidoEstadoCambiado implements ShouldBroadcastNow
             'estado_anterior' => $this->estadoAnterior,
             'tipo_pedido'     => $this->pedido->tipo_pedido,
             'total'           => (float) $this->pedido->total,
+            'mesa_numero'     => $this->pedido->mesa?->numero ?? 'N/A',
+            'mesa_zona'       => $this->pedido->mesa?->zona ?? 'N/A',
+            'usuario_id'      => $this->pedido->usuario_id,
+            'tiempo_finalizacion' => $this->pedido->updated_at->format('H:i'),
         ];
     }
 }

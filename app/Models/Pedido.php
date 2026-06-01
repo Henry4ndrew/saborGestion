@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Factura;
 use App\Events\PedidoEstadoCambiado;
+use App\Events\MesaEstadoCambiado;
 use Illuminate\Support\Facades\Auth;
 
 class Pedido extends Model
@@ -160,7 +161,7 @@ class Pedido extends Model
     {
         if ($estado == self::ESTADO_ENTREGADO) {
             $this->fecha_hora_entrega = now();
-            
+
             // Si ya está pagado/facturado (por ejemplo, vía QR), el pedido pasa a facturado directamente
             if ($this->factura && $this->factura->estado === Factura::ESTADO_PAGADA) {
                 $estado = self::ESTADO_FACTURADO;
@@ -175,6 +176,46 @@ class Pedido extends Model
                 $this->mesa->update(['estado' => 'libre']);
             }
         }
+    }
+
+    /**
+     * Libera la mesa asociada al pedido si TODOS los pedidos de esa mesa están pagados.
+     * Se llama automáticamente cuando se confirma el pago de una factura.
+     *
+     * @return bool true si la mesa fue liberada, false si no
+     */
+    public function liberarMesaAlPagar()
+    {
+        // Solo aplicable a pedidos de mesa
+        if ($this->tipo_pedido !== self::TIPO_MESA || !$this->mesa_id) {
+            return false;
+        }
+
+        $mesa = $this->mesa;
+        if (!$mesa) {
+            return false;
+        }
+
+        // Obtener todos los pedidos de esta mesa
+        $pedidosDeMesa = self::where('mesa_id', $this->mesa_id)->get();
+
+        // Verificar si TODOS los pedidos tienen factura pagada
+        $todosPagados = $pedidosDeMesa->every(function (Pedido $pedido) {
+            return $pedido->factura && $pedido->factura->estado === Factura::ESTADO_PAGADA;
+        });
+
+        // Si todos están pagados, liberar la mesa
+        if ($todosPagados && $mesa->estado !== 'libre') {
+            $estadoAnterior = $mesa->estado;
+            $mesa->update(['estado' => 'libre']);
+
+            // Emitir evento de cambio de estado de mesa
+            broadcast(new MesaEstadoCambiado($mesa, $estadoAnterior));
+
+            return true;
+        }
+
+        return false;
     }
 
    // app/Models/Pedido.php

@@ -255,9 +255,22 @@
             notificationsData: @json($notifications),
             refreshInterval: null,
             init() {
+                // Escuchar evento personalizado de WebSocket cuando un pedido está listo
+                window.addEventListener('pedido-listo', (event) => {
+                    console.log('📦 Dashboard: evento pedido-listo recibido', event.detail);
+                    this.refreshData();
+                });
+
+                // Escuchar evento de WebSocket cuando una mesa es liberada
+                window.addEventListener('mesa-liberada', (event) => {
+                    console.log('🪑 Dashboard: evento mesa-liberada recibido', event.detail);
+                    this.refreshData();
+                });
+
+                // Polling de fallback cada 5 minutos (300 segundos)
                 this.refreshInterval = setInterval(() => {
                     this.refreshData();
-                }, 30000); // cada 30 segundos
+                }, 300000);
             },
             async refreshData() {
                 try {
@@ -268,6 +281,7 @@
                     this.performanceData = data.performance;
                     this.notificationsData = data.notifications;
                     this.tablesData = data.tables;
+                    console.log('✅ Dashboard actualizado en tiempo real');
                 } catch (error) {
                     console.error('Error refrescando datos:', error);
                 }

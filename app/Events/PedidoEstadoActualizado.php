@@ -16,13 +16,25 @@ class PedidoEstadoActualizado implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $pedido;
+    public $numero_pedido;
+    public $mesa_numero;
+    public $mesa_zona;
+    public $usuario_responsable_id;
+    public $tiempo_finalizacion;
+    public $estado_anterior;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(Pedido $pedido)
+    public function __construct(Pedido $pedido, $estado_anterior = null)
     {
         $this->pedido = $pedido;
+        $this->numero_pedido = $pedido->numero_pedido;
+        $this->mesa_numero = $pedido->mesa?->numero ?? 'N/A';
+        $this->mesa_zona = $pedido->mesa?->zona ?? 'N/A';
+        $this->usuario_responsable_id = $pedido->usuario_id;
+        $this->tiempo_finalizacion = $pedido->updated_at;
+        $this->estado_anterior = $estado_anterior;
     }
 
     /**
@@ -34,6 +46,7 @@ class PedidoEstadoActualizado implements ShouldBroadcastNow
     {
         return [
             new Channel('pedidos.cocineros'),
+            new Channel('pedidos.meseros'),
         ];
     }
 
@@ -49,7 +62,13 @@ class PedidoEstadoActualizado implements ShouldBroadcastNow
     {
         return [
             'id' => $this->pedido->id,
-            'estado' => $this->pedido->estado
+            'numero_pedido' => $this->numero_pedido,
+            'estado' => $this->pedido->estado,
+            'estado_anterior' => $this->estado_anterior,
+            'mesa_numero' => $this->mesa_numero,
+            'mesa_zona' => $this->mesa_zona,
+            'usuario_id' => $this->usuario_responsable_id,
+            'tiempo_finalizacion' => $this->tiempo_finalizacion->format('H:i')
         ];
     }
 }
