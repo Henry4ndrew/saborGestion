@@ -392,7 +392,7 @@
                                     <i class="mr-2 fas fa-print"></i> Cerrar Turno
                                 </a>
                             @else
-                                <a href="{{ route('caja.abrir') }}" class="px-6 py-2 text-sm font-medium text-white transition-all duration-200 bg-gradient-to-r from-green-600 to-green-500 rounded-xl hover:shadow-lg hover:scale-105">
+                                <a href="{{ route('caja.create') }}" class="px-6 py-2 text-sm font-medium text-white transition-all duration-200 bg-gradient-to-r from-green-600 to-green-500 rounded-xl hover:shadow-lg hover:scale-105">
                                     <i class="mr-2 fas fa-cash-register"></i> Abrir Caja
                                 </a>
                             @endif

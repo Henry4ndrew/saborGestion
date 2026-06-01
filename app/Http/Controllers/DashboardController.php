@@ -227,25 +227,7 @@ class DashboardController extends Controller
             })
             ->update(['estado' => \App\Models\Pedido::ESTADO_FACTURADO]);
 
-        // Todos los pedidos que el mesero marcó como entregados
-        $pedidosEntregados = \App\Models\Pedido::with(['usuario', 'mesa', 'detalles.plato'])
-            ->where('estado', \App\Models\Pedido::ESTADO_ENTREGADO)
-            ->orderBy('updated_at', 'desc')
-            ->get();
-
-        // Caja abierta para el usuario actual
-        $cajaAbierta = CashClosure::where('user_id', auth()->id())
-            ->where('status', 'Open')
-            ->first();
-
-        // 7. Últimos 10 pagos realizados
-        $ultimosPagos = Factura::with('pedido', 'usuario')
-            ->where('estado', 'pagada')
-            ->orderBy('fecha_emision', 'desc')
-            ->limit(10)
-            ->get();
-
-        return view('dashboard.cajero.index', compact('pedidosEntregados', 'cajaAbierta', 'ultimosPagos'));
+        return $this->cajeroIndex();
     }
 
     public function cliente()

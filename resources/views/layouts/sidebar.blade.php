@@ -671,7 +671,7 @@ class="mb-1">
 
         @if(in_array($role, ['admin', 'cajero']))
             @php
-                $openClosure = \App\Models\CashClosure::where('status', 'open')->first();
+                $openClosure = \App\Models\CashClosure::where('status', 'Open')->first();
             @endphp
             <a href="{{ $openClosure ? route('caja.show', $openClosure) : route('caja.create') }}"
                class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200 group">
