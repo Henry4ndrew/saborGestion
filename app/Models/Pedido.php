@@ -39,7 +39,6 @@ class Pedido extends Model
         'tipo_pedido',
         'estado',
         'subtotal',
-        'impuesto',
         'descuento',
         'total',
         'notas',
@@ -52,7 +51,6 @@ class Pedido extends Model
 
     protected $casts = [
         'subtotal' => 'decimal:2',
-        'impuesto' => 'decimal:2',
         'descuento' => 'decimal:2',
         'total' => 'decimal:2',
         'fecha_hora_estimada' => 'datetime',
@@ -113,11 +111,48 @@ class Pedido extends Model
         return $this->hasOne(Factura::class);
     }
 
+    /**
+     * Pedidos que deben verse en la cocina (kitchen display): en estados
+     * pendiente/en_preparacion/listo. Regla de "pagar primero":
+     *  - Pedidos hechos por el CLIENTE (autoservicio): solo entran a cocina
+     *    cuando su factura YA está PAGADA (primero paga, luego se prepara).
+     *  - Pedidos del staff (mesero/admin/cajero): entran a cocina enseguida.
+     */
+    public function scopeVisibleEnCocina($query)
+    {
+        return $query
+            ->whereIn('estado', [self::ESTADO_PENDIENTE, self::ESTADO_EN_PREPARACION, self::ESTADO_LISTO])
+            ->where(function ($q) {
+                // No fue hecho por un cliente (lo hizo el staff) → va directo.
+                $q->whereDoesntHave('usuario', function ($u) {
+                        $u->where('role', 'cliente');
+                    })
+                  // …o ya está pagado (cualquier pedido del cliente ya pagado).
+                  ->orWhereHas('factura', function ($f) {
+                      $f->where('estado', Factura::ESTADO_PAGADA);
+                  });
+            });
+    }
+
+    /**
+     * ¿Se le pueden seguir agregando productos a la cuenta? Solo si el pedido
+     * no está facturado/cancelado Y su factura sigue PENDIENTE (sin pagar).
+     * Una vez pagada (mesa pagada por QR, o para llevar), la cuenta se cierra:
+     * no se puede agregar nada que no se haya pagado.
+     */
+    public function puedeAgregarProductos(): bool
+    {
+        if (in_array($this->estado, [self::ESTADO_FACTURADO, self::ESTADO_CANCELADO])) {
+            return false;
+        }
+        $estadoFactura = optional($this->factura)->estado;
+        return $estadoFactura === null || $estadoFactura === Factura::ESTADO_PENDIENTE;
+    }
+
     public function calcularTotales()
     {
         $this->subtotal = $this->detalles->sum('subtotal');
-        $this->impuesto = $this->subtotal * 0.13; // 13% IVA
-        $this->total = $this->subtotal + $this->impuesto - $this->descuento;
+        $this->total = $this->subtotal - $this->descuento;
         $this->save();
     }
 
@@ -194,7 +229,6 @@ public function generarOrUpdateFactura()
     $factura->cliente_nombre = $this->cliente_nombre ?? 'Cliente';
     $factura->cliente_telefono = $this->cliente_telefono;
     $factura->subtotal = $this->subtotal;
-    $factura->impuesto = $this->impuesto;
     $factura->descuento = $this->descuento;
     $factura->total = $this->total;
     //dd($factura->toArray()); // El código se detiene AQUÍ

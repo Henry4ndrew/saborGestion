@@ -5,51 +5,51 @@
 @section('content')
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<div class="container mx-auto px-4 py-8">
+<div class="container px-4 py-8 mx-auto">
     <!-- Header -->
     <div class="mb-8">
-        <div class="flex justify-between items-center">
+        <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-3xl font-bold" style="color: #C2410C;">
-                    <i class="fas fa-plus-circle mr-2"></i> Nuevo Pedido
+                    <i class="mr-2 fas fa-plus-circle"></i> Nuevo Pedido1
                 </h1>
-                <p class="text-muted mt-1">Seleccione los platos y complete la información del pedido</p>
+                <p class="mt-1 text-muted">Seleccione los platos y complete la información del pedido</p>
             </div>
-            <div class="px-4 py-2 rounded-lg font-semibold" style="background-color: #FED7AA; color: #C2410C;">
-                <i class="fas fa-receipt mr-2"></i> #{{ $numeroPedido }}
+            <div class="px-4 py-2 font-semibold rounded-lg" style="background-color: #FED7AA; color: #C2410C;">
+                <i class="mr-2 fas fa-receipt"></i> #{{ $numeroPedido }}
             </div>
         </div>
     </div>
 
     <form action="{{ route('pedidos.store') }}" method="POST" id="pedidoForm">
         @csrf
-        
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <!-- Panel Izquierdo - Platos -->
             <div class="lg:col-span-2">
-                <div class="bg-surface rounded-lg shadow-md" style="border: 1px solid #FED7AA;">
+                <div class="rounded-lg shadow-md bg-surface" style="border: 1px solid #FED7AA;">
                     <div class="p-4 border-b rounded-t-lg" style="background-color: #FFF7ED; border-color: #FED7AA;">
                         <h2 class="text-xl font-semibold" style="color: #C2410C;">
-                            <i class="fas fa-utensils mr-2"></i> Seleccionar Platos
+                            <i class="mr-2 fas fa-utensils"></i> Seleccionar Platos
                         </h2>
                         <div class="relative mt-3">
-                            <input type="text" 
+                            <input type="text"
                                 id="buscarPlato"
                                 placeholder="🔍 Buscar plato por nombre..."
                                 autocomplete="off"
-                                class="w-full px-4 py-2 pl-10 rounded-lg outline-none transition-all"
+                                class="w-full px-4 py-2 pl-10 transition-all rounded-lg outline-none"
                                 style="border: 1px solid #FED7AA; background-color: #FFFFFF; color: #111827;">
-                            <i class="fas fa-search absolute left-3 top-3" style="color: #78716C;"></i>
+                            <i class="absolute fas fa-search left-3 top-3" style="color: #78716C;"></i>
                         </div>
                     </div>
 
                     <div class="p-4 max-h-[600px] overflow-y-auto" id="platosContainer" style="background-color: #FFFFFF;">
                         @forelse($platosConStock as $categoria => $platosCategoria)
-                            <div class="categoria-group mb-6" data-categoria="{{ $categoria }}">
-                                <h3 class="font-bold mb-3 border-l-4 pl-2" style="color: #C2410C; border-color: #C2410C;">
+                            <div class="mb-6 categoria-group" data-categoria="{{ $categoria }}">
+                                <h3 class="pl-2 mb-3 font-bold border-l-4" style="color: #C2410C; border-color: #C2410C;">
                                     {{ $categoria }}
                                 </h3>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
                                     @foreach($platosCategoria as $plato)
                                         @php
                                             $tieneStock = $plato->tiene_stock;
@@ -62,48 +62,48 @@
                                             data-precio="{{ $plato->precio }}"
                                             data-categoria="{{ $categoria }}"
                                             data-tiene-stock="{{ $tieneStock ? 'true' : 'false' }}">
-                                            
-                                            <div class="flex justify-between items-start">
+
+                                            <div class="flex items-start justify-between">
                                                 <div class="flex-1">
-                                                    <div class="flex items-center gap-2 flex-wrap">
+                                                    <div class="flex flex-wrap items-center gap-2">
                                                         <h4 class="font-semibold {{ $tieneStock ? 'text-gray-800' : 'text-red-600' }}">
                                                             {{ $plato->nombre }}
                                                         </h4>
                                                         @if(!$tieneStock)
                                                             <span class="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
-                                                                <i class="fas fa-exclamation-triangle mr-1"></i> Sin Stock
+                                                                <i class="mr-1 fas fa-exclamation-triangle"></i> Sin Stock
                                                             </span>
                                                         @endif
                                                     </div>
-                                                    <p class="font-bold mt-1" style="color: #C2410C;">
+                                                    <p class="mt-1 font-bold" style="color: #C2410C;">
                                                         Bs. {{ number_format($plato->precio, 2) }}
                                                     </p>
                                                     @if($plato->descripcion)
-                                                        <p class="text-xs mt-1" style="color: #78716C;">
+                                                        <p class="mt-1 text-xs" style="color: #78716C;">
                                                             {{ Str::limit($plato->descripcion, 50) }}
                                                         </p>
                                                     @endif
-                                                    
+
                                                     <!-- Mostrar información de stock de ingredientes cuando no hay stock -->
                                                     @if(!$tieneStock && count($stockInsuficiente) > 0)
-                                                        <div class="mt-2 p-2 rounded text-xs" style="background-color: #FEF2F2; border: 1px solid #FECACA;">
-                                                            <p class="font-semibold text-red-700 mb-1">
-                                                                <i class="fas fa-box mr-1"></i> No disponible por:
+                                                        <div class="p-2 mt-2 text-xs rounded" style="background-color: #FEF2F2; border: 1px solid #FECACA;">
+                                                            <p class="mb-1 font-semibold text-red-700">
+                                                                <i class="mr-1 fas fa-box"></i> No disponible por:
                                                             </p>
                                                             @foreach($stockInsuficiente as $ingrediente)
-                                                                <p class="text-red-600 ml-2">
-                                                                    • {{ $ingrediente['nombre'] }}: 
+                                                                <p class="ml-2 text-red-600">
+                                                                    • {{ $ingrediente['nombre'] }}:
                                                                     @if(isset($ingrediente['motivo']))
                                                                         {{ $ingrediente['motivo'] }}
                                                                     @else
-                                                                        disponible {{ number_format($ingrediente['disponible'], 2) }} {{ $ingrediente['unidad'] }} 
+                                                                        disponible {{ number_format($ingrediente['disponible'], 2) }} {{ $ingrediente['unidad'] }}
                                                                         (necesita {{ number_format($ingrediente['necesario'], 2) }} {{ $ingrediente['unidad'] }})
                                                                     @endif
                                                                 </p>
                                                             @endforeach
                                                         </div>
                                                     @endif
-                                                    
+
                                                     <!-- Mostrar stock de ingredientes cuando SI hay stock -->
                                                     @if($tieneStock && isset($plato->ingredientes) && count($plato->ingredientes) > 0)
                                                         <div class="mt-2">
@@ -123,20 +123,20 @@
                                                             </div>
                                                         </div>
                                                     @endif
-                                                    
+
                                                     <!-- Mensaje para platos sin ingredientes registrados -->
                                                     @if($plato->ingredientes->count() === 0)
-                                                        <div class="mt-2 p-2 rounded text-xs" style="background-color: #FEF2F2; border: 1px solid #FECACA;">
-                                                            <p class="font-semibold text-red-700 mb-1">
-                                                                <i class="fas fa-exclamation-circle mr-1"></i> Configuración incompleta:
+                                                        <div class="p-2 mt-2 text-xs rounded" style="background-color: #FEF2F2; border: 1px solid #FECACA;">
+                                                            <p class="mb-1 font-semibold text-red-700">
+                                                                <i class="mr-1 fas fa-exclamation-circle"></i> Configuración incompleta:
                                                             </p>
-                                                            <p class="text-red-600 ml-2">
+                                                            <p class="ml-2 text-red-600">
                                                                 Este plato no tiene ingredientes registrados. Contacte al administrador.
                                                             </p>
                                                         </div>
                                                     @endif
                                                 </div>
-                                                
+
                                                 <button type="button"
                                                     class="agregar-plato text-white rounded-lg px-3 py-1.5 text-sm transition flex items-center gap-1"
                                                     style="background-color: {{ $tieneStock ? '#C2410C' : '#9CA3AF' }}; cursor: {{ $tieneStock ? 'pointer' : 'not-allowed' }}; opacity: {{ $tieneStock ? '1' : '0.5' }};"
@@ -144,7 +144,7 @@
                                                     data-nombre="{{ $plato->nombre }}"
                                                     data-precio="{{ $plato->precio }}"
                                                     {{ !$tieneStock ? 'disabled' : '' }}>
-                                                    <i class="fas fa-plus text-xs"></i> Agregar
+                                                    <i class="text-xs fas fa-plus"></i> Agregar
                                                 </button>
                                             </div>
                                         </div>
@@ -152,8 +152,8 @@
                                 </div>
                             </div>
                         @empty
-                            <div class="text-center py-8" style="color: #78716C;">
-                                <i class="fas fa-exclamation-circle text-4xl mb-2"></i>
+                            <div class="py-8 text-center" style="color: #78716C;">
+                                <i class="mb-2 text-4xl fas fa-exclamation-circle"></i>
                                 <p>No hay platos disponibles</p>
                             </div>
                         @endforelse
@@ -163,35 +163,35 @@
 
             <!-- Panel Derecho - Detalles del Pedido -->
             <div>
-                <div class="bg-surface rounded-lg shadow-md sticky top-4" style="border: 1px solid #FED7AA;">
+                <div class="sticky rounded-lg shadow-md bg-surface top-4" style="border: 1px solid #FED7AA;">
                     <div class="p-4 border-b rounded-t-lg" style="background-color: #FFF7ED; border-color: #FED7AA;">
                         <h2 class="text-xl font-semibold" style="color: #C2410C;">
-                            <i class="fas fa-shopping-cart mr-2"></i> Carrito de Pedido
+                            <i class="mr-2 fas fa-shopping-cart"></i> Carrito de Pedido
                         </h2>
                     </div>
 
                     <div class="p-4" style="background-color: #FFFFFF;">
                         <!-- Tipo de Pedido -->
                         <div class="mb-6">
-                            <label class="block text-sm font-medium mb-2" style="color: #111827;">Tipo de Pedido</label>
+                            <label class="block mb-2 text-sm font-medium" style="color: #111827;">Tipo de Pedido</label>
                             <div class="grid grid-cols-3 gap-2">
-                                <button type="button" class="tipo-btn p-2 rounded-lg border-2 transition-all text-center"
+                                <button type="button" class="p-2 text-center transition-all border-2 rounded-lg tipo-btn"
                                     data-tipo="mesa"
                                     style="border-color: #C2410C; background-color: #FFF7ED; color: #C2410C;">
-                                    <i class="fas fa-chair text-lg"></i>
-                                    <span class="block text-sm mt-1">Mesa</span>
+                                    <i class="text-lg fas fa-chair"></i>
+                                    <span class="block mt-1 text-sm">Mesa</span>
                                 </button>
-                                <button type="button" class="tipo-btn p-2 rounded-lg border-2 transition-all text-center"
+                                <button type="button" class="p-2 text-center transition-all border-2 rounded-lg tipo-btn"
                                     data-tipo="para_llevar"
                                     style="border-color: #FED7AA; background-color: #FFFFFF; color: #78716C;">
-                                    <i class="fas fa-box text-lg"></i>
-                                    <span class="block text-sm mt-1">Para Llevar</span>
+                                    <i class="text-lg fas fa-box"></i>
+                                    <span class="block mt-1 text-sm">Para Llevar</span>
                                 </button>
-                                <button type="button" class="tipo-btn p-2 rounded-lg border-2 transition-all text-center"
+                                <button type="button" class="p-2 text-center transition-all border-2 rounded-lg tipo-btn"
                                     data-tipo="delivery"
                                     style="border-color: #FED7AA; background-color: #FFFFFF; color: #78716C;">
-                                    <i class="fas fa-motorcycle text-lg"></i>
-                                    <span class="block text-sm mt-1">Delivery</span>
+                                    <i class="text-lg fas fa-motorcycle"></i>
+                                    <span class="block mt-1 text-sm">Delivery</span>
                                 </button>
                             </div>
                             <input type="hidden" name="tipo_pedido" id="tipo_pedido_input" value="mesa">
@@ -199,10 +199,10 @@
 
                         <!-- Mesa -->
                         <div id="mesaContainer" class="mb-6">
-                            <label class="block text-sm font-medium mb-2" style="color: #111827;">
-                                <i class="fas fa-chair mr-1"></i> Seleccionar Mesa
+                            <label class="block mb-2 text-sm font-medium" style="color: #111827;">
+                                <i class="mr-1 fas fa-chair"></i> Seleccionar Mesa
                             </label>
-                            <select name="mesa_id" class="w-full px-3 py-2 rounded-lg outline-none transition-all"
+                            <select name="mesa_id" class="w-full px-3 py-2 transition-all rounded-lg outline-none"
                                 style="border: 1px solid #FED7AA; background-color: #FFFFFF; color: #111827;">
                                 <option value="">-- Seleccione una mesa --</option>
                                 @foreach($mesas as $mesa)
@@ -212,7 +212,7 @@
                                 @endforeach
                             </select>
                             @error('mesa_id')
-                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
 
@@ -227,73 +227,73 @@
 
                         <!-- Email del cliente (siempre visible, sirve para enviar la factura) -->
                         <div class="mb-6">
-                            <label class="block text-sm font-medium mb-1" style="color: #111827;">
-                                <i class="fas fa-envelope mr-1"></i> Email del cliente <span class="text-xs text-gray-500">(para enviarle la factura por correo)</span>
+                            <label class="block mb-1 text-sm font-medium" style="color: #111827;">
+                                <i class="mr-1 fas fa-envelope"></i> Email del cliente <span class="text-xs text-gray-500">(para enviarle la factura por correo)</span>
                             </label>
                             <input type="email" name="cliente_email"
                                 value="{{ old('cliente_email', $emailDefault) }}"
                                 placeholder="cliente@ejemplo.com"
-                                class="w-full px-3 py-2 rounded-lg outline-none transition-all"
+                                class="w-full px-3 py-2 transition-all rounded-lg outline-none"
                                 style="border: 1px solid #FED7AA; background-color: #FFFFFF; color: #111827;">
                             @error('cliente_email')
-                                <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <!-- Datos del Cliente (solo para delivery / para llevar) -->
                         <div id="clienteContainer" class="hidden mb-6 space-y-3">
                             @if($esCliente)
-                                <div class="px-3 py-2 text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded">
-                                    <i class="fas fa-info-circle mr-1"></i>
+                                <div class="px-3 py-2 text-xs border rounded text-amber-800 bg-amber-50 border-amber-200">
+                                    <i class="mr-1 fas fa-info-circle"></i>
                                     Hemos pre-llenado tus datos desde tu perfil. Modifícalos solo si el pedido es para otra persona.
                                 </div>
                             @endif
                             <div>
-                                <label class="block text-sm font-medium mb-1" style="color: #111827;">
-                                    <i class="fas fa-user mr-1"></i> Nombre del Cliente *
+                                <label class="block mb-1 text-sm font-medium" style="color: #111827;">
+                                    <i class="mr-1 fas fa-user"></i> Nombre del Cliente *
                                 </label>
                                 <input type="text" name="cliente_nombre"
                                     value="{{ old('cliente_nombre', $nombreDefault) }}"
-                                    class="w-full px-3 py-2 rounded-lg outline-none transition-all"
+                                    class="w-full px-3 py-2 transition-all rounded-lg outline-none"
                                     style="border: 1px solid #FED7AA; background-color: #FFFFFF; color: #111827;">
                                 @error('cliente_nombre')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                                 @enderror
                             </div>
                             <div>
-                                <label class="block text-sm font-medium mb-1" style="color: #111827;">
-                                    <i class="fas fa-phone mr-1"></i> Teléfono *
+                                <label class="block mb-1 text-sm font-medium" style="color: #111827;">
+                                    <i class="mr-1 fas fa-phone"></i> Teléfono *
                                 </label>
                                 <input type="tel" name="cliente_telefono"
                                     value="{{ old('cliente_telefono', $telefonoDefault) }}"
-                                    class="w-full px-3 py-2 rounded-lg outline-none transition-all"
+                                    class="w-full px-3 py-2 transition-all rounded-lg outline-none"
                                     style="border: 1px solid #FED7AA; background-color: #FFFFFF; color: #111827;">
                                 @error('cliente_telefono')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                                 @enderror
                             </div>
 
                             <div id="direccionContainer" class="hidden">
-                                <label class="block text-sm font-medium mb-1" style="color: #111827;">
-                                    <i class="fas fa-map-marker-alt mr-1"></i> Dirección de Entrega *
+                                <label class="block mb-1 text-sm font-medium" style="color: #111827;">
+                                    <i class="mr-1 fas fa-map-marker-alt"></i> Dirección de Entrega *
                                 </label>
                                 <textarea name="direccion" id="direccion" rows="3"
-                                    class="w-full px-3 py-2 rounded-lg outline-none transition-all"
+                                    class="w-full px-3 py-2 transition-all rounded-lg outline-none"
                                     style="border: 1px solid #FED7AA; background-color: #FFFFFF; color: #111827;">{{ old('direccion', $direccionDefault) }}</textarea>
                                 @error('direccion')
-                                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                                    <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                                 @enderror
                             </div>
                         </div>
 
                         <!-- Items del Pedido -->
                         <div class="mb-6">
-                            <h3 class="font-semibold mb-2" style="color: #111827;">
-                                <i class="fas fa-list mr-1"></i> Items del Pedido
+                            <h3 class="mb-2 font-semibold" style="color: #111827;">
+                                <i class="mr-1 fas fa-list"></i> Items del Pedido
                             </h3>
-                            <div id="itemsList" class="space-y-2 max-h-80 overflow-y-auto rounded-lg p-2" style="background-color: #FFF7ED;">
-                                <div class="text-center py-8" style="color: #78716C;">
-                                    <i class="fas fa-shopping-cart text-4xl mb-2 block"></i>
+                            <div id="itemsList" class="p-2 space-y-2 overflow-y-auto rounded-lg max-h-80" style="background-color: #FFF7ED;">
+                                <div class="py-8 text-center" style="color: #78716C;">
+                                    <i class="block mb-2 text-4xl fas fa-shopping-cart"></i>
                                     <p>No hay items agregados</p>
                                 </div>
                             </div>
@@ -301,51 +301,47 @@
 
                         <!-- MAPA Delivery -->
                         <div id="delivery-map-container" class="hidden">
-                            <label class="block text-sm font-medium mb-2 mt-4" style="color: #111827;">
-                                <i class="fas fa-map mr-1"></i> Seleccione ubicación en el mapa
+                            <label class="block mt-4 mb-2 text-sm font-medium" style="color: #111827;">
+                                <i class="mr-1 fas fa-map"></i> Seleccione ubicación en el mapa
                             </label>
-                            <div id="map" style="height: 350px;" class="rounded-lg border"></div>
+                            <div id="map" style="height: 350px;" class="border rounded-lg"></div>
                             <input type="hidden" name="latitud" id="latitud" value="{{ old('latitud') }}">
                             <input type="hidden" name="longitud" id="longitud" value="{{ old('longitud') }}">
                         </div>
 
                         <!-- Notas -->
                         <div class="mb-6">
-                            <label class="block text-sm font-medium mb-1" style="color: #111827;">
-                                <i class="fas fa-sticky-note mr-1"></i> Notas Adicionales
+                            <label class="block mb-1 text-sm font-medium" style="color: #111827;">
+                                <i class="mr-1 fas fa-sticky-note"></i> Notas Adicionales
                             </label>
                             <textarea name="notas" rows="2"
-                                class="w-full px-3 py-2 rounded-lg outline-none transition-all"
+                                class="w-full px-3 py-2 transition-all rounded-lg outline-none"
                                 style="border: 1px solid #FED7AA; background-color: #FFFFFF; color: #111827;">{{ old('notas') }}</textarea>
                         </div>
 
                         <!-- Descuento -->
                         <div class="mb-6" style="display:none">
-                            <label class="block text-sm font-medium mb-1" style="color: #111827;">
-                                <i class="fas fa-tag mr-1"></i> Descuento (Bs.)
+                            <label class="block mb-1 text-sm font-medium" style="color: #111827;">
+                                <i class="mr-1 fas fa-tag"></i> Descuento (Bs.)
                             </label>
                             <input type="number" name="descuento" value="{{ old('descuento', 0) }}" step="0.01" min="0"
-                                class="w-full px-3 py-2 rounded-lg outline-none transition-all"
+                                class="w-full px-3 py-2 transition-all rounded-lg outline-none"
                                 style="border: 1px solid #FED7AA; background-color: #FFFFFF; color: #111827;">
                         </div>
-                    
+
                         <!-- Totales -->
-                        <div class="rounded-lg p-4 mb-6" style="background-color: #FFF7ED;">
+                        <div class="p-4 mb-6 rounded-lg" style="background-color: #FFF7ED;">
                             <div class="space-y-2">
                                 <div class="flex justify-between text-sm">
                                     <span style="color: #78716C;">Subtotal:</span>
                                     <span id="subtotal" class="font-semibold" style="color: #111827;">Bs. 0.00</span>
                                 </div>
                                 <div class="flex justify-between text-sm">
-                                    <span style="color: #78716C;">IVA (13%):</span>
-                                    <span id="impuesto" class="font-semibold" style="color: #111827;">Bs. 0.00</span>
-                                </div>
-                                <div class="flex justify-between text-sm">
                                     <span style="color: #78716C;">Descuento:</span>
                                     <span id="descuentoDisplay" class="font-semibold" style="color: #C2410C;">Bs. 0.00</span>
                                 </div>
-                                <div class="border-t pt-2 mt-2" style="border-color: #FED7AA;">
-                                    <div class="flex justify-between font-bold text-lg">
+                                <div class="pt-2 mt-2 border-t" style="border-color: #FED7AA;">
+                                    <div class="flex justify-between text-lg font-bold">
                                         <span style="color: #111827;">TOTAL:</span>
                                         <span id="total" style="color: #C2410C;">Bs. 0.00</span>
                                     </div>
@@ -355,11 +351,11 @@
 
                         <!-- Botones -->
                         <div class="flex gap-3">
-                            <button type="submit" class="flex-1 text-white py-2 rounded-lg transition flex items-center justify-center gap-2 hover:opacity-90"
+                            <button type="submit" class="flex items-center justify-center flex-1 gap-2 py-2 text-white transition rounded-lg hover:opacity-90"
                                 style="background-color: #C2410C;">
                                 <i class="fas fa-check-circle"></i> Crear Pedido
                             </button>
-                            <a href="{{ route('pedidos.index') }}" class="flex-1 text-white py-2 rounded-lg transition text-center flex items-center justify-center gap-2 hover:opacity-90"
+                            <a href="{{ route('pedidos.index') }}" class="flex items-center justify-center flex-1 gap-2 py-2 text-center text-white transition rounded-lg hover:opacity-90"
                                 style="background-color: #78716C;">
                                 <i class="fas fa-times-circle"></i> Cancelar
                             </a>
@@ -455,7 +451,7 @@ function initMap() {
     // Si ya hay coordenadas (restauradas de old()), poner el marcador
     const oldLat = document.getElementById('latitud').value;
     const oldLng = document.getElementById('longitud').value;
-    
+
     if (oldLat && oldLng) {
         setMarker(parseFloat(oldLat), parseFloat(oldLng), false);
         map.setView([parseFloat(oldLat), parseFloat(oldLng)], 16);
@@ -479,7 +475,7 @@ function initMap() {
 function toggleMap() {
     const tipoPedido = document.getElementById('tipo_pedido_input').value;
     const mapContainer = document.getElementById('delivery-map-container');
-    
+
     if(tipoPedido === 'delivery') {
         mapContainer.classList.remove('hidden');
         setTimeout(() => { if(!map) initMap(); else map.invalidateSize(); }, 200);
@@ -491,35 +487,35 @@ function toggleMap() {
 // Funciones del carrito
 function renderItems() {
     const container = document.getElementById('itemsList');
-    
+
     if (!items.length) {
-        container.innerHTML = `<div class="text-center py-8" style="color: #78716C;"><i class="fas fa-shopping-cart text-4xl mb-2 block"></i><p>No hay items agregados</p></div>`;
+        container.innerHTML = `<div class="py-8 text-center" style="color: #78716C;"><i class="block mb-2 text-4xl fas fa-shopping-cart"></i><p>No hay items agregados</p></div>`;
         updateTotals();
         return;
     }
-    
+
     container.innerHTML = items.map((item, index) => `
-        <div class="bg-white border rounded-lg p-3 mb-2 shadow-sm" style="border-color: #FED7AA;">
-            <div class="flex justify-between items-start mb-2">
+        <div class="p-3 mb-2 bg-white border rounded-lg shadow-sm" style="border-color: #FED7AA;">
+            <div class="flex items-start justify-between mb-2">
                 <div class="flex-1">
                     <div class="font-semibold" style="color: #111827;">${escapeHtml(item.nombre)}</div>
-                    <div class="font-bold text-sm mt-1" style="color: #C2410C;">Bs. ${item.precio_unitario.toFixed(2)}</div>
+                    <div class="mt-1 text-sm font-bold" style="color: #C2410C;">Bs. ${item.precio_unitario.toFixed(2)}</div>
                 </div>
-                <button type="button" onclick="removeItem(${index})" class="hover:opacity-70 ml-2" style="color: #C2410C;">
+                <button type="button" onclick="removeItem(${index})" class="ml-2 hover:opacity-70" style="color: #C2410C;">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
             <div class="flex items-center gap-2 mt-2">
                 <label class="text-sm" style="color: #78716C;">Cant:</label>
-                <input type="number" value="${item.cantidad}" min="1" class="w-16 px-2 py-1 border rounded text-center outline-none" style="border-color: #FED7AA;" onchange="updateItemQuantity(${index}, this.value)">
-                <input type="text" placeholder="Notas..." value="${escapeHtml(item.notas)}" class="flex-1 px-2 py-1 border rounded text-sm outline-none" style="border-color: #FED7AA;" onblur="updateItemNotes(${index}, this.value)">
+                <input type="number" value="${item.cantidad}" min="1" class="w-16 px-2 py-1 text-center border rounded outline-none" style="border-color: #FED7AA;" onchange="updateItemQuantity(${index}, this.value)">
+                <input type="text" placeholder="Notas..." value="${escapeHtml(item.notas)}" class="flex-1 px-2 py-1 text-sm border rounded outline-none" style="border-color: #FED7AA;" onblur="updateItemNotes(${index}, this.value)">
             </div>
             <input type="hidden" name="items[${index}][plato_id]" value="${item.plato_id}">
             <input type="hidden" name="items[${index}][cantidad]" value="${item.cantidad}">
             <input type="hidden" name="items[${index}][notas]" value="${escapeHtml(item.notas)}">
         </div>
     `).join('');
-    
+
     updateTotals();
 }
 
@@ -528,9 +524,9 @@ function addItem(platoId, nombre, precio, tieneStock) {
         showNotification('❌ No hay suficiente stock para: ' + nombre, 'error');
         return false;
     }
-    
+
     const existingItem = items.find(item => item.plato_id == platoId);
-    
+
     if (existingItem) {
         existingItem.cantidad++;
         showNotification('✓ Cantidad actualizada: ' + nombre, 'success');
@@ -538,7 +534,7 @@ function addItem(platoId, nombre, precio, tieneStock) {
         items.push({ plato_id: platoId, nombre: nombre, precio_unitario: precio, cantidad: 1, notas: '' });
         showNotification('✓ Agregado al carrito: ' + nombre, 'success');
     }
-    
+
     renderItems();
     return true;
 }
@@ -565,11 +561,9 @@ function updateItemNotes(index, notes) {
 function updateTotals() {
     let subtotal = items.reduce((sum, item) => sum + (item.precio_unitario * item.cantidad), 0);
     let descuento = parseFloat(document.querySelector('input[name="descuento"]').value) || 0;
-    let impuesto = subtotal * 0.13;
-    let total = subtotal + impuesto - descuento;
-    
+    let total = subtotal - descuento;
+
     document.getElementById('subtotal').innerHTML = `Bs. ${subtotal.toFixed(2)}`;
-    document.getElementById('impuesto').innerHTML = `Bs. ${impuesto.toFixed(2)}`;
     document.getElementById('descuentoDisplay').innerHTML = `Bs. ${descuento.toFixed(2)}`;
     document.getElementById('total').innerHTML = `Bs. ${total.toFixed(2)}`;
 }
@@ -598,11 +592,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const mesaContainer = document.getElementById('mesaContainer');
     const clienteContainer = document.getElementById('clienteContainer');
     const direccionContainer = document.getElementById('direccionContainer');
-    
+
     function updateTipoPedido(tipo) {
         tipoInput.value = tipo;
         toggleMap();
-        
+
         tipoBtns.forEach(btn => {
             const btnTipo = btn.dataset.tipo;
             if (btnTipo === tipo) {
@@ -615,7 +609,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 btn.style.color = '#78716C';
             }
         });
-        
+
         if (tipo === 'mesa') {
             mesaContainer.classList.remove('hidden');
             clienteContainer.classList.add('hidden');
@@ -625,23 +619,23 @@ document.addEventListener('DOMContentLoaded', function() {
             direccionContainer.classList.toggle('hidden', tipo !== 'delivery');
         }
     }
-    
+
     tipoBtns.forEach(btn => {
         btn.addEventListener('click', function() {
             updateTipoPedido(this.dataset.tipo);
         });
     });
-    
+
     updateTipoPedido('{{ old('tipo_pedido', 'mesa') }}');
-    
+
     // Si hay items restaurados, renderizarlos
     if (items.length > 0) {
         renderItems();
     }
-    
+
     // Evento para descuento
     document.querySelector('input[name="descuento"]').addEventListener('input', updateTotals);
-    
+
     // Event delegation para botones agregar
     document.getElementById('platosContainer').addEventListener('click', function(e) {
         let btn = e.target.closest('.agregar-plato');
@@ -651,7 +645,7 @@ document.addEventListener('DOMContentLoaded', function() {
             addItem(btn.dataset.id, btn.dataset.nombre, parseFloat(btn.dataset.precio), platoItem.dataset.tieneStock === 'true');
         }
     });
-    
+
     // Buscador
     const buscador = document.getElementById('buscarPlato');
     if (buscador) {
@@ -666,50 +660,50 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 300);
         });
     }
-    
+
     // Validación del formulario
     document.getElementById('pedidoForm').addEventListener('submit', async function(e) {
         e.preventDefault(); // Evitar envío automático
-        
+
         if (items.length === 0) {
             showNotification('❌ Debe agregar al menos un plato al pedido', 'error');
             return false;
         }
-        
+
         const submitBtn = this.querySelector('[type="submit"]');
         const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Verificando stock...';
+        submitBtn.innerHTML = '<i class="mr-2 fas fa-spinner fa-spin"></i> Verificando stock...';
         submitBtn.disabled = true;
-        
+
         try {
             let stockInsuficiente = [];
             // Optimización: podríamos hacer esto en una sola petición, pero mantendremos la lógica actual corregida
             for (const item of items) {
                 const response = await fetch('/api/verificar-stock-plato', {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json', 
+                    headers: {
+                        'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
                         'Accept': 'application/json'
                     },
                     body: JSON.stringify({ plato_id: item.plato_id, cantidad: item.cantidad })
                 });
-                
+
                 if (!response.ok) continue;
-                
+
                 const data = await response.json();
                 if (!data.disponible) {
                     stockInsuficiente.push(`${item.nombre} (x${item.cantidad}) - ${data.mensaje}`);
                 }
             }
-            
+
             if (stockInsuficiente.length > 0) {
                 showNotification('❌ Stock insuficiente:\n' + stockInsuficiente.join('\n'), 'error');
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
                 return false;
             }
-            
+
             const tipoPedido = tipoInput.value;
             if (tipoPedido === 'mesa') {
                 const mesaSelect = document.querySelector('select[name="mesa_id"]');
@@ -735,10 +729,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     return false;
                 }
             }
-            
+
             // Si todo está correcto, enviar el formulario
             this.submit();
-            
+
         } catch (error) {
             console.error('Error durante la validación:', error);
             showNotification('❌ Error al verificar el pedido. Intente nuevamente.', 'error');

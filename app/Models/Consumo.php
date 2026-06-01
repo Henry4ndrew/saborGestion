@@ -14,7 +14,6 @@ class Consumo extends Model
         'tipo_pedido',
         'estado',
         'subtotal',
-        'impuesto',
         'descuento',
         'total',
         'detalles',
@@ -24,7 +23,6 @@ class Consumo extends Model
     protected $casts = [
         'detalles' => 'array',
         'subtotal' => 'decimal:2',
-        'impuesto' => 'decimal:2',
         'descuento' => 'decimal:2',
         'total' => 'decimal:2',
         'fecha_consumo' => 'datetime'

@@ -13,15 +13,18 @@ class ComandaController extends Controller
 {
     public function index(Request $request)
     {
+        // visibleEnCocina(): muestra pendiente/en_preparacion/listo, pero los
+        // pedidos "para llevar" solo cuando ya están PAGADOS (primero paga,
+        // luego cocina). Mesa y delivery entran enseguida.
         $query = Pedido::with(['detalles.plato', 'mesa', 'usuario'])
-            ->whereIn('estado', ['pendiente', 'en_preparacion', 'listo']);
-        
-        // Filtro Solo Hoy
+            ->visibleEnCocina();
+
+        // Filtro Solo Hoy (grupo)
         if ($request->boolean('soloHoy')) {
             $query->whereDate('created_at', now()->today());
         }
 
-        // Filtro Solo Pendientes
+        // Filtro Solo Pendientes (grupo)
         if ($request->boolean('soloPendientes')) {
             $query->where('estado', 'pendiente');
         }
@@ -30,22 +33,21 @@ class ComandaController extends Controller
         if ($request->filled('estado') && $request->estado != 'todos') {
             $query->where('estado', $request->estado);
         }
-        
-        $comandas = $query->orderBy('created_at', 'asc')->paginate(12);
-        
-        $tipos = Pedido::getTipos();
-        
-        // Estadísticas (Ajustadas si es solo hoy)
-        $statsQuery = Pedido::query();
-        if ($request->boolean('soloHoy')) {
-            $statsQuery->whereDate('created_at', now()->today());
-        }
 
+        $comandas = $query->orderBy('created_at', 'asc')->paginate(12);
+
+        $tipos = Pedido::getTipos();
+
+        // Estadísticas: mismo criterio que la cocina (visibleEnCocina) + filtro
+        // opcional "solo hoy" del grupo.
+        $soloHoy = $request->boolean('soloHoy');
+        $statBase = fn() => Pedido::visibleEnCocina()
+            ->when($soloHoy, fn($q) => $q->whereDate('created_at', now()->today()));
         $stats = [
-            'total' => (clone $statsQuery)->whereIn('estado', ['pendiente', 'en_preparacion', 'listo'])->count(),
-            'pendientes' => (clone $statsQuery)->where('estado', 'pendiente')->count(),
-            'en_preparacion' => (clone $statsQuery)->where('estado', 'en_preparacion')->count(),
-            'listos' => (clone $statsQuery)->where('estado', 'listo')->count()
+            'total' => $statBase()->whereIn('estado', ['pendiente', 'en_preparacion', 'listo'])->count(),
+            'pendientes' => $statBase()->where('estado', 'pendiente')->count(),
+            'en_preparacion' => $statBase()->where('estado', 'en_preparacion')->count(),
+            'listos' => $statBase()->where('estado', 'listo')->count()
         ];
         
         // Si es petición AJAX, devolver solo el HTML de las tarjetas
@@ -57,7 +59,7 @@ class ComandaController extends Controller
             return response()->json([
                 'html' => $html,
                 'pagination' => $pagination,
-                'stats' => $stats
+                'stats' => $stats,
             ]);
         }
         
@@ -163,7 +165,6 @@ class ComandaController extends Controller
             'tipo_pedido' => $pedido->tipo_pedido,
             'estado' => 'completado',
             'subtotal' => $pedido->subtotal,
-            'impuesto' => $pedido->impuesto,
             'descuento' => $pedido->descuento,
             'total' => $pedido->total,
             'detalles' => $detalles,

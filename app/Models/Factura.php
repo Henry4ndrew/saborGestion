@@ -17,19 +17,19 @@ class Factura extends Model
         'cliente_nombre',
         'cliente_nit',
         'cliente_telefono',
+        'cliente_email',
         'subtotal',
-        'impuesto',
         'descuento',
         'total',
         'metodo_pago',
         'estado',
         'fecha_emision',
-        'usuario_id'
+        'usuario_id',
+        'cierre_caja_id'
     ];
 
     protected $casts = [
         'subtotal' => 'decimal:2',
-        'impuesto' => 'decimal:2',
         'descuento' => 'decimal:2',
         'total' => 'decimal:2',
         'fecha_emision' => 'datetime'
@@ -74,12 +74,17 @@ class Factura extends Model
         return $this->belongsTo(User::class, 'usuario_id');
     }
 
+    public function cierreCaja()
+    {
+        return $this->belongsTo(CierreCaja::class, 'cierre_caja_id');
+    }
+
     /**
-     * Recalcula el total de la factura basándose en el subtotal, impuesto y descuento.
+     * Recalcula el total de la factura basándose en el subtotal y descuento.
      */
     public function recalculateTotal()
     {
-        $this->total = ($this->subtotal + $this->impuesto) - $this->descuento;
+        $this->total = $this->subtotal - $this->descuento;
         return $this;
     }
 

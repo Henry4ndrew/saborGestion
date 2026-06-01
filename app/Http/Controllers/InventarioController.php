@@ -21,14 +21,22 @@ class InventarioController extends Controller
         // Ingredientes con stock bajo
         $stockBajo = $ingredientes->filter(fn($i) => $i->hasLowStock())->count();
         $stockAgotado = $ingredientes->filter(fn($i) => $i->cantidad_actual <= 0)->count();
-        
+
+        // Platos (con receta) para la reposición por producción. Incluye sus
+        // ingredientes con la cantidad de la receta (pivot) para el cálculo en vivo.
+        $platos = \App\Models\Plato::has('ingredientes')
+            ->with('ingredientes:id,nombre,unidad_medida')
+            ->orderBy('nombre')
+            ->get(['id', 'nombre']);
+
         return view('inventario.index', compact(
             'ingredientes',
             'totalIngredientes',
             'ingredientesConInventario',
             'ingredientesSinInventario',
             'stockBajo',
-            'stockAgotado'
+            'stockAgotado',
+            'platos'
         ));
     }
     
@@ -77,8 +85,45 @@ class InventarioController extends Controller
     public function destroy(Inventario $inventario)
     {
         $inventario->delete();
-        
+
         return redirect()->route('inventario.index')
             ->with('success', 'Registro de inventario eliminado');
+    }
+
+    /**
+     * Repone el inventario con EXACTAMENTE lo necesario para producir N unidades
+     * de un plato: suma (receta × cantidad) de cada ingrediente. Así el admin
+     * agrega solo lo que necesita para X unidades de un producto, no "al máximo".
+     */
+    public function reponerPorProducto(Request $request)
+    {
+        $request->validate([
+            'plato_id' => 'required|exists:platos,id',
+            'cantidad' => 'required|integer|min:1|max:1000',
+        ]);
+
+        $plato = \App\Models\Plato::with('ingredientes')->find($request->plato_id);
+        $cantidad = (int) $request->cantidad;
+
+        if ($plato->ingredientes->isEmpty()) {
+            return redirect()->route('inventario.index')
+                ->with('error', 'El plato "' . $plato->nombre . '" no tiene receta; no se puede calcular.');
+        }
+
+        $detalle = [];
+        foreach ($plato->ingredientes as $ing) {
+            $necesario = (float) $ing->pivot->cantidad * $cantidad;
+
+            $inv = Inventario::firstOrNew(['ingrediente_id' => $ing->id]);
+            $inv->cantidad_actual = (float) ($inv->cantidad_actual ?? 0) + $necesario;
+            if (!$inv->stock_minimo) { $inv->stock_minimo = 100; }
+            if (!$inv->stock_maximo) { $inv->stock_maximo = 10000; }
+            $inv->save();
+
+            $detalle[] = '+' . number_format($necesario, 0) . $ing->unidad_medida . ' ' . $ing->nombre;
+        }
+
+        return redirect()->route('inventario.index')
+            ->with('success', 'Repuesto para ' . $cantidad . ' x ' . $plato->nombre . ': ' . implode(', ', $detalle) . '.');
     }
 }

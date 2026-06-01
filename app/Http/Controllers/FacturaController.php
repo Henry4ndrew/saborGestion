@@ -77,7 +77,7 @@ class FacturaController extends Controller
             'cliente_nombre' => 'required|string|max:255',
             'cliente_nit' => 'nullable|string|max:20',
             'cliente_telefono' => 'nullable|string|max:20',
-            'descuento' => 'required|numeric|min:0|max:' . ($factura->subtotal + $factura->impuesto),
+            'descuento' => 'required|numeric|min:0|max:' . $factura->subtotal,
             'metodo_pago' => 'required|in:efectivo,tarjeta,qr,transferencia',
         ]);
 
@@ -120,6 +120,22 @@ class FacturaController extends Controller
             $factura->pedido->update(['estado' => Pedido::ESTADO_FACTURADO]);
         }
 
+        // Avisar en vivo (mesero/cajero/admin) que esta cuenta se pagó (tu mejora).
+        // El pago ya quedó guardado; si Reverb falla, no rompemos la respuesta.
+        try {
+            $factura->loadMissing('pedido.mesa');
+            broadcast(new \App\Events\CuentaPagada([
+                'mesa'           => $factura->pedido?->mesa?->numero_mesa,
+                'numero_factura' => $factura->numero_factura,
+                'total'          => number_format($factura->total, 2),
+                'metodo'         => $factura->metodo_pago,
+                'origen'         => 'factura',
+            ]));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('No se pudo emitir CuentaPagada (factura): ' . $e->getMessage());
+        }
+
+        // Respuesta AJAX/JSON del grupo (p. ej. cobro desde modal).
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json(['success' => true, 'message' => 'Factura pagada']);
         }
@@ -203,7 +219,6 @@ class FacturaController extends Controller
                 'total'           => number_format($factura->total, 2),
                 'descuento'       => number_format($factura->descuento, 2),
                 'subtotal'        => number_format($factura->subtotal, 2),
-                'impuesto'        => number_format($factura->impuesto, 2),
                 'pedido_id'       => $factura->pedido_id,
             ],
         ]);

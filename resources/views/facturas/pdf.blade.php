@@ -260,8 +260,9 @@
                     <div class="row"><strong>Nombre:</strong> {{ $factura->cliente_nombre ?? 'Consumidor final' }}</div>
                     <div class="row"><strong>NIT/CI:</strong> {{ $factura->cliente_nit ?? 'S/N' }}</div>
                     <div class="row"><strong>Teléfono:</strong> {{ $factura->cliente_telefono ?? '—' }}</div>
-                    @if($factura->pedido?->usuario?->email)
-                        <div class="row"><strong>Email:</strong> {{ $factura->pedido->usuario->email }}</div>
+                    @php $emailCliente = $factura->cliente_email ?: optional($factura->pedido?->usuario)->email; @endphp
+                    @if($emailCliente)
+                        <div class="row"><strong>Email:</strong> {{ $emailCliente }}</div>
                     @endif
                 </div>
             </td>
@@ -350,10 +351,6 @@
                     <tr>
                         <td class="l">Subtotal:</td>
                         <td class="r">Bs {{ number_format($factura->subtotal, 2) }}</td>
-                    </tr>
-                    <tr>
-                        <td class="l">Impuesto IVA (13%):</td>
-                        <td class="r">Bs {{ number_format($factura->impuesto, 2) }}</td>
                     </tr>
                     @if($factura->descuento > 0)
                         <tr class="descuento">

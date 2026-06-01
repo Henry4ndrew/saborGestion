@@ -112,7 +112,7 @@ class ReporteConsumoController extends Controller
         $handle = fopen('php://temp', 'w');
         
         // Cabeceras
-        fputcsv($handle, ['N° Pedido', 'Tipo', 'Usuario', 'Fecha', 'Subtotal', 'Impuesto', 'Descuento', 'Total']);
+        fputcsv($handle, ['N° Pedido', 'Tipo', 'Usuario', 'Fecha', 'Subtotal', 'Descuento', 'Total']);
         
         foreach ($consumos as $consumo) {
             fputcsv($handle, [
@@ -121,7 +121,6 @@ class ReporteConsumoController extends Controller
                 $consumo->usuario->name ?? 'N/A',
                 $consumo->fecha_consumo->format('d/m/Y H:i'),
                 $consumo->subtotal,
-                $consumo->impuesto,
                 $consumo->descuento,
                 $consumo->total
             ]);

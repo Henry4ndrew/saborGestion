@@ -80,7 +80,7 @@
                         </div>
                         <div>
                             <x-input-label for="descuento" value="Descuento" />
-                            <x-text-input id="descuento" name="descuento" type="number" step="0.01" class="block w-full mt-1" x-model="selectedFactura.descuento" @input="selectedFactura.total = (parseFloat(selectedFactura.subtotal) + parseFloat(selectedFactura.impuesto) - parseFloat($event.target.value)).toFixed(2)" />
+                            <x-text-input id="descuento" name="descuento" type="number" step="0.01" class="block w-full mt-1" x-model="selectedFactura.descuento" @input="selectedFactura.total = (parseFloat(selectedFactura.subtotal) - parseFloat($event.target.value)).toFixed(2)" />
                         </div>
                         <div>
                             <x-input-label for="metodo_pago" value="Método de Pago" />
@@ -249,9 +249,9 @@
                                     <span class="text-sm text-gray-500">Cliente:</span>
                                     <span class="text-sm font-semibold text-gray-800" x-text="qrFacturaData?.cliente_nombre"></span>
                                 </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm text-gray-500">Subtotal + IVA:</span>
-                                    <span class="text-sm text-gray-700" x-text="'Bs. ' + qrFacturaData?.subtotal + ' + ' + qrFacturaData?.impuesto"></span>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-500">Subtotal:</span>
+                                    <span class="text-sm text-gray-700" x-text="'Bs. ' + qrFacturaData?.subtotal"></span>
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-sm text-gray-500">Descuento:</span>

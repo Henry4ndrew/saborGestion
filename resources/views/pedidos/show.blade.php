@@ -112,8 +112,8 @@
                 </div>
             </div>
 
-            <!-- D4: Agregar productos al pedido abierto -->
-            @if(in_array($pedido->estado, ['pendiente', 'en_preparacion']) && $platosDisponibles->isNotEmpty())
+            <!-- D4: Agregar productos solo mientras la cuenta NO esté pagada/cerrada -->
+            @if($pedido->puedeAgregarProductos() && $platosDisponibles->isNotEmpty())
             <div x-data="agregarItems()" class="overflow-hidden bg-white shadow-lg rounded-xl">
                 <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-emerald-50 to-white">
                     <h2 class="text-xl font-semibold text-emerald-700">
@@ -370,12 +370,22 @@
                              style="z-index: 9999;"
                              @keydown.escape.window="cerrarQr()">
                             <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 text-center space-y-3">
-                                <h4 class="text-lg font-semibold text-gray-800">Escanea para pagar</h4>
+                                <h4 class="text-lg font-semibold text-gray-800">Escanea o toca para pagar</h4>
                                 <p class="text-xs text-gray-500">
                                     Factura <span class="font-mono" x-text="qrFacturaData.numero_factura"></span>
                                     · Bs <span x-text="qrFacturaData.total"></span>
                                 </p>
                                 <div class="flex justify-center" x-html="qrSvg" x-show="!qrPagado"></div>
+
+                                {{-- Pagar en el MISMO dispositivo: si el QR está en tu teléfono no
+                                     puedes escanearlo, así que abrimos la página de pago directo. --}}
+                                <a :href="qrUrl" target="_blank" x-show="!qrPagado"
+                                   class="w-full inline-flex items-center justify-center px-4 py-2.5 text-sm font-semibold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 transition">
+                                    <i class="mr-2 fas fa-mobile-alt"></i> Pagar aquí (en este dispositivo)
+                                </a>
+                                <p class="text-[11px] text-gray-400" x-show="!qrPagado">
+                                    ¿El QR está en tu teléfono? Toca el botón para pagar sin escanear.
+                                </p>
 
                                 @if(config('app.env') === 'local' || config('app.debug'))
                                     {{-- Solo en local/debug: el sistema externo de QR no puede llegar a
@@ -424,6 +434,7 @@
                             qrLoading: false,
                             qrModalOpen: false,
                             qrSvg: '',
+                            qrUrl: '',
                             qrEmisor: '',
                             qrFacturaData: {},
                             qrPagado: false,
@@ -438,6 +449,7 @@
                                     if (!res.ok) throw new Error('Error generando QR');
                                     const data = await res.json();
                                     this.qrSvg = data.qr_svg;
+                                    this.qrUrl = data.url;
                                     this.qrEmisor = data.emisor;
                                     this.qrFacturaData = data.factura;
                                     this.qrPagado = false;
@@ -577,10 +589,15 @@
                 <div class="text-sm text-blue-700">
                     Generada automáticamente para el cobro.
                 </div>
+                {{-- El PDF abre en el navegador (stream inline). El mesero puede
+                     VERLO ("Ver PDF"); admin/cajero/cliente además lo descargan. --}}
+                @if(in_array(auth()->user()->role, ['admin', 'cajero', 'cliente', 'mesero']))
                 <a href="{{ route('facturas.pdf', $pedido->factura) }}" target="_blank"
                    class="inline-flex items-center mt-3 text-sm font-medium text-blue-700 hover:text-blue-900">
-                    <i class="mr-1 fas fa-file-pdf"></i> Ver / Descargar PDF
+                    <i class="mr-1 fas fa-file-pdf"></i>
+                    {{ auth()->user()->role === 'mesero' ? 'Ver PDF' : 'Ver / Descargar PDF' }}
                 </a>
+                @endif
             </div>
             @endif
 
@@ -595,10 +612,6 @@
                         <div class="flex justify-between">
                             <span class="text-gray-600">Subtotal:</span>
                             <span class="font-medium text-gray-800">Bs. {{ number_format($pedido->subtotal, 2) }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">IVA (13%):</span>
-                            <span class="font-medium text-gray-800">Bs. {{ number_format($pedido->impuesto, 2) }}</span>
                         </div>
                         @if($pedido->descuento > 0)
                         <div class="flex justify-between">
