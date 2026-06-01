@@ -5,22 +5,46 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use App\Models\Pedido;
+use App\Models\Factura;
+use App\Models\User;
+use App\Models\Plato;
+use App\Models\Ingrediente;
+use App\Models\Inventario;
+use App\Models\CashClosure;
+use App\Models\DetallePedido;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+
+use App\Services\DashboardAnalyticsService;
+
 class DashboardController extends Controller
 {
+    protected $analytics;
+
+    public function __construct(DashboardAnalyticsService $analytics)
+    {
+        $this->analytics = $analytics;
+    }
+
     public function administrador()
     {
         $this->authorizeRole('admin');
-        
-        // Obtenemos una colección vacía para evitar el error de variable indefinida
-        // En el futuro, esto se podrá reemplazar con una consulta real a la base de datos
-        $productosDestacados = collect();
 
-        // Alerta de inventario: ingredientes con stock bajo (cantidad <= mínimo).
-        $stockBajo = \App\Models\Inventario::whereColumn('cantidad_actual', '<=', 'stock_minimo')->count();
+        $alerts = $this->analytics->getAlerts();
+        $summary = $this->analytics->getGeneralSummary();
+        $salesPerDay = $this->analytics->getSalesPerDay();
+        $salesPerMonth = $this->analytics->getSalesPerMonth();
+        $topProducts = $this->analytics->getTopProducts();
+        $paymentMethods = $this->analytics->getPaymentMethods();
+        $recentActivity = $this->analytics->getRecentActivity();
 
-        return view('dashboard.administrador.index', compact('productosDestacados', 'stockBajo'));
+        return view('admin.analytics', compact(
+            'alerts', 'summary', 'salesPerDay', 'salesPerMonth', 
+            'topProducts', 'paymentMethods', 'recentActivity'
+        ));
     }
-    
+
     public function mesero()
     {
         $this->authorizeRole('mesero');
@@ -43,7 +67,7 @@ class DashboardController extends Controller
 
         return view('dashboard.mesero.index', compact('pedidos', 'pedidosFinalizados'));
     }
-    
+
     public function cocinero()
     {
         $this->authorizeRole('cocinero');
@@ -74,7 +98,7 @@ class DashboardController extends Controller
 
         return view('dashboard.cocinero.index', compact('comandas', 'tipos', 'stats'));
     }
-    
+
     public function cajero()
     {
         $this->authorizeRole('cajero');
@@ -94,7 +118,7 @@ class DashboardController extends Controller
 
         return view('dashboard.cajero.index', compact('pedidosEntregados'));
     }
-    
+
     public function cliente()
     {
         $this->authorizeRole('cliente');

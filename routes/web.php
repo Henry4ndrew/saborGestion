@@ -1,4 +1,5 @@
 <?php
+use App\Livewire\CookDashboard;
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PlatoController;
@@ -41,7 +42,12 @@ Route::get('/inicio', function () {
 Route::middleware(['auth'])->group(function () {
     // Dashboards
     Route::get('/dashboard/administrador', [DashboardController::class, 'administrador'])->name('dashboard.administrador');
-    Route::get('/dashboard/mesero', [DashboardController::class, 'mesero'])->name('dashboard.mesero');
+    Route::get('/dashboard/mesero', [App\Http\Controllers\ServerDashboardController::class, 'index'])
+    ->name('dashboard.mesero')
+    ->middleware('auth', 'role:admin,mesero');
+    Route::get('/dashboard/mesero/refresh', [App\Http\Controllers\ServerDashboardController::class, 'refreshData'])
+    ->name('mesero.refresh-data')
+    ->middleware('auth', 'role:admin,mesero');
     Route::get('/dashboard/cocinero', [DashboardController::class, 'cocinero'])->name('dashboard.cocinero');
     Route::get('/dashboard/cajero', [DashboardController::class, 'cajero'])->name('dashboard.cajero');
     Route::get('/dashboard/cliente', [DashboardController::class, 'cliente'])->name('dashboard.cliente');
@@ -206,6 +212,15 @@ Route::middleware(['auth', 'role:cajero,admin'])->prefix('cierres')->name('caja.
         ->name('pdf')
         ->middleware('role:admin,cajero');
 });
+Route::middleware(['role:admin'])->group(function () {
+    Route::get('/admin/analytics', [App\Http\Controllers\AdminAnalyticsController::class, 'index'])
+        ->name('admin.analytics');
+    Route::get('/mesero/refresh-data', [App\Http\Controllers\ServerDashboardController::class, 'refreshData'])
+    ->name('mesero.refresh-data')
+    ->middleware('auth', 'role:mesero');
+});
+
+
 
 //Rutas de las apis utilizadas
 Route::prefix('api')->group(base_path('routes/api.php'));

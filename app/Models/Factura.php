@@ -76,7 +76,7 @@ class Factura extends Model
 
     public function cierreCaja()
     {
-        return $this->belongsTo(CierreCaja::class, 'cierre_caja_id');
+        return $this->belongsTo(CashClosure::class, 'cierre_caja_id');
     }
 
     /**
