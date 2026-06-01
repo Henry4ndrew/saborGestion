@@ -50,6 +50,11 @@ class FacturaController extends Controller
         // Usar la lógica del modelo Pedido para generar o actualizar la factura
         $factura = $pedido->generarOrUpdateFactura();
 
+        if ($pedido->estado !== Pedido::ESTADO_FACTURADO) {
+            $pedido->estado = Pedido::ESTADO_FACTURADO;
+            $pedido->save();
+        }
+
         return redirect()->route('facturas.index')
             ->with('success', 'Factura ' . $factura->numero_factura . ' generada correctamente para el pedido #' . $pedido->numero_pedido);
     }

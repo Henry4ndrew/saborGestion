@@ -123,15 +123,19 @@ class Pedido extends Model
 
     public function actualizarEstado($estado)
     {
-        $this->estado = $estado;
-
         if ($estado == self::ESTADO_ENTREGADO) {
             $this->fecha_hora_entrega = now();
+            
+            // Si ya está pagado/facturado (por ejemplo, vía QR), el pedido pasa a facturado directamente
+            if ($this->factura && $this->factura->estado === Factura::ESTADO_PAGADA) {
+                $estado = self::ESTADO_FACTURADO;
+            }
         }
 
+        $this->estado = $estado;
         $this->save();
 
-        if ($this->tipo_pedido == self::TIPO_MESA && $estado == self::ESTADO_ENTREGADO) {
+        if ($this->tipo_pedido == self::TIPO_MESA && ($estado == self::ESTADO_ENTREGADO || $estado == self::ESTADO_FACTURADO)) {
             if ($this->mesa) {
                 $this->mesa->update(['estado' => 'libre']);
             }

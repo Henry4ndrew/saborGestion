@@ -113,18 +113,6 @@ class PedidoController extends Controller
                     }
                 }
 
-                // Crear un objeto con los datos necesarios
-                $platosProcesados[] = (object)[
-                    'id' => $plato->id,
-                    'nombre' => $plato->nombre,
-                    'precio' => $plato->precio,
-                    'descripcion' => $plato->descripcion,
-                    'categoria_id' => $plato->categoria_id,
-                    'tiene_stock' => $tieneStock,
-                    'stock_insuficiente' => $stockInsuficiente,
-                    'ingredientes' => $plato->ingredientes
-                ];
-
                 // Si el plato no tiene ingredientes registrados, también sin stock
                 if ($plato->ingredientes->count() === 0) {
                     $tieneStock = false;

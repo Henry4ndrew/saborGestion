@@ -76,6 +76,13 @@ class DashboardController extends Controller
     {
         $this->authorizeRole('cajero');
 
+        // Auto-fix: Si hay pedidos entregados que ya tienen factura pagada, moverlos a facturado
+        \App\Models\Pedido::where('estado', \App\Models\Pedido::ESTADO_ENTREGADO)
+            ->whereHas('factura', function ($query) {
+                $query->where('estado', \App\Models\Factura::ESTADO_PAGADA);
+            })
+            ->update(['estado' => \App\Models\Pedido::ESTADO_FACTURADO]);
+
         // Todos los pedidos que el mesero marcó como entregados
         $pedidosEntregados = \App\Models\Pedido::with(['usuario', 'mesa', 'detalles.plato'])
             ->where('estado', \App\Models\Pedido::ESTADO_ENTREGADO)

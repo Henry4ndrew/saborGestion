@@ -68,6 +68,9 @@ class PagoQrController extends Controller
         // El pedido pasa a 'facturado' recién cuando se entrega (flujo
         // normal: pendiente → en_preparacion → listo → entregado → facturado).
         // El estado de cobro ya queda reflejado en la factura.
+        if ($factura->pedido && $factura->pedido->estado === Pedido::ESTADO_ENTREGADO) {
+            $factura->pedido->update(['estado' => Pedido::ESTADO_FACTURADO]);
+        }
 
         // Spec #5.1: enviar automáticamente la factura por correo al cliente
         // luego de confirmar el pago QR.
