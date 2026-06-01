@@ -115,6 +115,22 @@ class FacturaController extends Controller
             $factura->pedido->update(['estado' => Pedido::ESTADO_FACTURADO]);
         }
 
+        // Avisar en vivo (mesero/cajero/admin) que esta cuenta se pagó (tu mejora).
+        // El pago ya quedó guardado; si Reverb falla, no rompemos la respuesta.
+        try {
+            $factura->loadMissing('pedido.mesa');
+            broadcast(new \App\Events\CuentaPagada([
+                'mesa'           => $factura->pedido?->mesa?->numero_mesa,
+                'numero_factura' => $factura->numero_factura,
+                'total'          => number_format($factura->total, 2),
+                'metodo'         => $factura->metodo_pago,
+                'origen'         => 'factura',
+            ]));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('No se pudo emitir CuentaPagada (factura): ' . $e->getMessage());
+        }
+
+        // Respuesta AJAX/JSON del grupo (p. ej. cobro desde modal).
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json(['success' => true, 'message' => 'Factura pagada']);
         }

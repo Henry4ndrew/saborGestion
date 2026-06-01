@@ -354,10 +354,11 @@ public function storeCliente(Request $request)
         $tipos = Pedido::getTipos();
         $estadosDetalle = DetallePedido::getEstados();
 
-        // Para D4: si el pedido está abierto, cargar platos disponibles para
-        // que el panel "Agregar productos" pueda renderizar el selector.
+        // Para D4: mientras la cuenta esté ABIERTA (no pagada ni cerrada),
+        // cargar platos disponibles para que el panel "Agregar productos" se
+        // pueda renderizar — aunque el pedido ya esté listo/entregado.
         $platosDisponibles = collect();
-        if (in_array($pedido->estado, [Pedido::ESTADO_PENDIENTE, Pedido::ESTADO_EN_PREPARACION])) {
+        if ($pedido->puedeAgregarProductos()) {
             $platosDisponibles = Plato::where('disponible', true)
                 ->with('categoria')
                 ->orderBy('categoria_id')
@@ -541,15 +542,22 @@ public function storeCliente(Request $request)
     // Método auxiliar para actualizar la comanda
     private function actualizarComanda(Pedido $pedido)
     {
-        // Si el pedido está en comanda (pendiente o en preparación)
+        // Si el pedido está en comanda (pendiente/en preparación/listo),
+        // avisamos a cocina que fue editado para que el kitchen display se
+        // refresque en vivo (p. ej. al quitar un producto equivocado).
         if (in_array($pedido->estado, ['pendiente', 'en_preparacion', 'listo'])) {
-            // Opcional: Notificar a cocina que el pedido fue actualizado
-            //event(new \App\Events\PedidoActualizado($pedido));
+            try {
+                event(new \App\Events\PedidoActualizado($pedido->fresh()));
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('No se pudo notificar a cocina (update): ' . $e->getMessage());
+            }
         }
     }
     // Método para verificar stock antes de actualizar o guardar
     private function verificarStockItems($items)
     {
+        // La validación "sin receta = no vendible" (tu regla) ya está en el bucle
+        // de abajo (ingredientes->count() === 0). Aquí solo inicializamos el acumulador.
         $ingredientesNecesarios = [];
 
         foreach ($items as $item) {
@@ -1151,10 +1159,17 @@ public function destroyCliente(Pedido $pedido)
             abort(403, 'No puedes modificar pedidos de otros usuarios.');
         }
 
-        if (!in_array($pedido->estado, [Pedido::ESTADO_PENDIENTE, Pedido::ESTADO_EN_PREPARACION])) {
+        // Solo se puede agregar mientras la cuenta NO esté PAGADA ni cerrada.
+        // (Una mesa pagada por QR, o un para-llevar ya pagado, queda cerrada.)
+        $pedido->loadMissing('factura');
+        if (!$pedido->puedeAgregarProductos()) {
             return redirect()->route('pedidos.show', $pedido)
-                ->with('error', 'No se pueden agregar productos a un pedido en estado ' . $pedido->estado);
+                ->with('error', 'No se pueden agregar productos: la cuenta ya está pagada o cerrada.');
         }
+
+        // Estado antes de agregar: si ya estaba listo/entregado, el producto
+        // nuevo debe prepararse, así que el pedido se reabre a cocina (abajo).
+        $estadoPrevio = $pedido->estado;
 
         $request->validate([
             'items' => 'required|array|min:1',
@@ -1213,12 +1228,36 @@ public function destroyCliente(Pedido $pedido)
 
             DB::commit();
 
+            // Si la cuenta ya estaba lista/entregada, el producto nuevo debe
+            // prepararse: reabrimos el pedido a cocina (misma factura; la cuenta
+            // sigue abierta hasta que el cajero cobre).
+            $volvioACocina = false;
+            if (in_array($estadoPrevio, [Pedido::ESTADO_LISTO, Pedido::ESTADO_ENTREGADO])) {
+                $pedido->estado = Pedido::ESTADO_PENDIENTE;
+                $pedido->save(); // dispara PedidoEstadoCambiado (hook del modelo)
+                $volvioACocina = true;
+            }
+
+            // Avisar a cocina SIEMPRE que se agregan productos, para que el
+            // kitchen display muestre el item nuevo en vivo: ya sea reapareciendo
+            // (si estaba entregado/listo) o refrescando el card (si seguía en
+            // pendiente/en_preparacion). Se emite PedidoCreado, que es el evento
+            // al que la cocina reacciona recargando las comandas.
+            try {
+                event(new \App\Events\PedidoCreado($pedido->fresh()));
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('No se pudo notificar a cocina (agregarItems): ' . $e->getMessage());
+            }
+
             $mensaje = [];
             if ($agregados > 0) {
                 $mensaje[] = $agregados . ' producto' . ($agregados === 1 ? '' : 's') . ' nuevo' . ($agregados === 1 ? '' : 's');
             }
             if ($sumados > 0) {
                 $mensaje[] = $sumados . ' ' . ($sumados === 1 ? 'producto sumado' : 'productos sumados');
+            }
+            if ($volvioACocina) {
+                $mensaje[] = 'enviado de nuevo a cocina';
             }
 
             return redirect()->route('pedidos.show', $pedido)

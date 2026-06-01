@@ -113,11 +113,49 @@ class Pedido extends Model
         return $this->hasOne(Factura::class);
     }
 
+    /**
+     * Pedidos que deben verse en la cocina (kitchen display): en estados
+     * pendiente/en_preparacion/listo. Regla de "pagar primero":
+     *  - Pedidos hechos por el CLIENTE (autoservicio): solo entran a cocina
+     *    cuando su factura YA está PAGADA (primero paga, luego se prepara).
+     *  - Pedidos del staff (mesero/admin/cajero): entran a cocina enseguida.
+     */
+    public function scopeVisibleEnCocina($query)
+    {
+        return $query
+            ->whereIn('estado', [self::ESTADO_PENDIENTE, self::ESTADO_EN_PREPARACION, self::ESTADO_LISTO])
+            ->where(function ($q) {
+                // No fue hecho por un cliente (lo hizo el staff) → va directo.
+                $q->whereDoesntHave('usuario', function ($u) {
+                        $u->where('role', 'cliente');
+                    })
+                  // …o ya está pagado (cualquier pedido del cliente ya pagado).
+                  ->orWhereHas('factura', function ($f) {
+                      $f->where('estado', Factura::ESTADO_PAGADA);
+                  });
+            });
+    }
+
+    /**
+     * ¿Se le pueden seguir agregando productos a la cuenta? Solo si el pedido
+     * no está facturado/cancelado Y su factura sigue PENDIENTE (sin pagar).
+     * Una vez pagada (mesa pagada por QR, o para llevar), la cuenta se cierra:
+     * no se puede agregar nada que no se haya pagado.
+     */
+    public function puedeAgregarProductos(): bool
+    {
+        if (in_array($this->estado, [self::ESTADO_FACTURADO, self::ESTADO_CANCELADO])) {
+            return false;
+        }
+        $estadoFactura = optional($this->factura)->estado;
+        return $estadoFactura === null || $estadoFactura === Factura::ESTADO_PENDIENTE;
+    }
+
     public function calcularTotales()
     {
         $this->subtotal = $this->detalles->sum('subtotal');
-        $this->impuesto = $this->subtotal * 0.13; // 13% IVA
-        $this->total = $this->subtotal + $this->impuesto - $this->descuento;
+        $this->impuesto = 0; // IVA desactivado: no se cobra (total = subtotal - descuento)
+        $this->total = $this->subtotal - $this->descuento;
         $this->save();
     }
 

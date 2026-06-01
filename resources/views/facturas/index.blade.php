@@ -249,9 +249,9 @@
                                     <span class="text-sm text-gray-500">Cliente:</span>
                                     <span class="text-sm font-semibold text-gray-800" x-text="qrFacturaData?.cliente_nombre"></span>
                                 </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm text-gray-500">Subtotal + IVA:</span>
-                                    <span class="text-sm text-gray-700" x-text="'Bs. ' + qrFacturaData?.subtotal + ' + ' + qrFacturaData?.impuesto"></span>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-500">Subtotal:</span>
+                                    <span class="text-sm text-gray-700" x-text="'Bs. ' + qrFacturaData?.subtotal"></span>
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-sm text-gray-500">Descuento:</span>

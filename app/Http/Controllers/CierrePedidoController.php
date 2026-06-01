@@ -30,8 +30,11 @@ class CierrePedidoController extends Controller
             ->where('tipo_pedido', Pedido::TIPO_MESA)
             ->whereNotNull('mesa_id')
             ->whereNotIn('estado', [Pedido::ESTADO_CANCELADO, Pedido::ESTADO_FACTURADO])
+            // Mostrar mesas con cuenta abierta: factura pendiente (por cobrar) O
+            // ya pagada (p. ej. por QR) pero sin cerrar — así el cajero puede
+            // confirmar el cierre y liberar la mesa aunque ya esté pagada.
             ->whereHas('factura', function ($q) {
-                $q->where('estado', Factura::ESTADO_PENDIENTE);
+                $q->whereIn('estado', [Factura::ESTADO_PENDIENTE, Factura::ESTADO_PAGADA]);
             })
             ->orderBy('created_at')
             ->get();
@@ -43,6 +46,10 @@ class CierrePedidoController extends Controller
                 'total' => $pedidos->sum('total'),
                 'cantidad_pedidos' => $pedidos->count(),
                 'abierta_desde' => $pedidos->min('created_at'),
+                // ¿Hay algo por cobrar, o ya está todo pagado y solo falta cerrar?
+                'tiene_pendiente' => $pedidos->contains(
+                    fn($p) => optional($p->factura)->estado === Factura::ESTADO_PENDIENTE
+                ),
             ];
         })->values();
 
@@ -56,7 +63,7 @@ class CierrePedidoController extends Controller
             ->where('tipo_pedido', Pedido::TIPO_MESA)
             ->whereNotIn('estado', [Pedido::ESTADO_CANCELADO, Pedido::ESTADO_FACTURADO])
             ->whereHas('factura', function ($q) {
-                $q->where('estado', Factura::ESTADO_PENDIENTE);
+                $q->whereIn('estado', [Factura::ESTADO_PENDIENTE, Factura::ESTADO_PAGADA]);
             })
             ->orderBy('created_at')
             ->get();
@@ -89,7 +96,13 @@ class CierrePedidoController extends Controller
     public function cerrar(Request $request, Mesa $cierre)
     {
         $request->validate([
-            'metodo_pago' => 'required|in:efectivo,tarjeta,qr,transferencia',
+            'metodo_pago'    => 'required|in:efectivo,tarjeta,qr,transferencia',
+            'cliente_nombre' => 'required|string|max:255',  // nombre y apellido del cliente
+            'cliente_nit'    => 'required|string|max:20',    // CI/NIT obligatorio al cobrar
+            'cliente_email'  => 'nullable|email',            // opcional: enviar factura
+        ], [
+            'cliente_nombre.required' => 'El nombre y apellido del cliente es obligatorio.',
+            'cliente_nit.required'    => 'El CI/NIT del cliente es obligatorio para cobrar.',
         ]);
 
         // No filtramos por factura pendiente: si el cliente ya pagó por QR
@@ -117,10 +130,21 @@ class CierrePedidoController extends Controller
         try {
             foreach ($pedidos as $pedido) {
                 if ($pedido->factura) {
+                    // Guardar los datos del cliente que pidió el cajero.
+                    $pedido->factura->cliente_nombre = $request->cliente_nombre;
+                    $pedido->factura->cliente_nit = $request->cliente_nit;
+                    if ($request->filled('cliente_email')) {
+                        $pedido->factura->cliente_email = $request->cliente_email;
+                    }
+
                     if ($pedido->factura->estado === Factura::ESTADO_PENDIENTE) {
                         $pedido->factura->metodo_pago = $request->metodo_pago;
                         $pedido->factura->estado = Factura::ESTADO_PAGADA;
-                        $pedido->factura->save();
+                    }
+                    $pedido->factura->save();
+
+                    // Solo se envía correo si el cliente dio un email (opcional).
+                    if ($request->filled('cliente_email')) {
                         $facturasParaNotificar[] = $pedido->factura;
                     }
                 }
@@ -139,13 +163,27 @@ class CierrePedidoController extends Controller
             // pagadas por un pago QR previo, que ya enviaron su correo).
             $correosEnviados = 0;
             foreach ($facturasParaNotificar as $factura) {
-                if ($this->enviarFacturaAlCliente($factura)) {
+                if ($this->enviarFacturaAlCliente($factura, $request->cliente_email)) {
                     $correosEnviados++;
                 }
             }
 
             $totalCobrado = $pedidos->sum('total');
             $facturasIds = $pedidos->pluck('factura.id')->filter()->values()->all();
+
+            // Avisar en vivo (mesero/cajero/admin) que la mesa se cobró y liberó.
+            // La cuenta ya se cerró (commit hecho); si Reverb falla, no rompemos.
+            try {
+                broadcast(new \App\Events\CuentaPagada([
+                    'mesa'    => $cierre->numero_mesa,
+                    'total'   => number_format($totalCobrado, 2),
+                    'metodo'  => $request->metodo_pago,
+                    'pedidos' => $pedidos->count(),
+                    'origen'  => 'cierre',
+                ]));
+            } catch (\Throwable $e) {
+                Log::warning('No se pudo emitir CuentaPagada (cierre): ' . $e->getMessage());
+            }
 
             return redirect()->route('cierres.index')
                 ->with('success', sprintf(
@@ -170,15 +208,15 @@ class CierrePedidoController extends Controller
      * Envía la factura por correo al usuario dueño del pedido. Devuelve true
      * si el correo se despachó OK, false si falló o no había email destino.
      */
-    private function enviarFacturaAlCliente(Factura $factura): bool
+    private function enviarFacturaAlCliente(Factura $factura, ?string $emailOverride = null): bool
     {
         $factura->loadMissing(['pedido.usuario', 'pedido.detalles.plato']);
 
-        // Preferimos el email del cliente capturado en el pedido (lo que el
-        // mesero anotó). Si no hay, caemos al email del usuario del sistema
-        // que creó el pedido (típicamente el cliente cuando se autoatiende).
-        $email = $factura->pedido?->cliente_email
-            ?: optional($factura->pedido?->usuario)->email;
+        // Prioridad: el correo que el cajero ingresó al cobrar. Si no, el del
+        // pedido (lo que anotó el mesero) y por último el del usuario del sistema.
+        $email = $emailOverride
+            ?: ($factura->pedido?->cliente_email
+            ?: optional($factura->pedido?->usuario)->email);
 
         if (!$email) {
             Log::info('Cierre de cuenta: factura sin email destino', [
