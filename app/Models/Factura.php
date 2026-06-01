@@ -19,7 +19,6 @@ class Factura extends Model
         'cliente_telefono',
         'cliente_email',
         'subtotal',
-        'impuesto',
         'descuento',
         'total',
         'metodo_pago',
@@ -31,7 +30,6 @@ class Factura extends Model
 
     protected $casts = [
         'subtotal' => 'decimal:2',
-        'impuesto' => 'decimal:2',
         'descuento' => 'decimal:2',
         'total' => 'decimal:2',
         'fecha_emision' => 'datetime'
@@ -82,11 +80,11 @@ class Factura extends Model
     }
 
     /**
-     * Recalcula el total de la factura basándose en el subtotal, impuesto y descuento.
+     * Recalcula el total de la factura basándose en el subtotal y descuento.
      */
     public function recalculateTotal()
     {
-        $this->total = ($this->subtotal + $this->impuesto) - $this->descuento;
+        $this->total = $this->subtotal - $this->descuento;
         return $this;
     }
 

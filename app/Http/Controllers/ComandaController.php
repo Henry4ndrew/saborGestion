@@ -165,7 +165,6 @@ class ComandaController extends Controller
             'tipo_pedido' => $pedido->tipo_pedido,
             'estado' => 'completado',
             'subtotal' => $pedido->subtotal,
-            'impuesto' => $pedido->impuesto,
             'descuento' => $pedido->descuento,
             'total' => $pedido->total,
             'detalles' => $detalles,

@@ -119,12 +119,6 @@
                                 <span class="font-medium text-red-600">-${{ number_format($pedido->descuento, 2) }}</span>
                             </div>
                         @endif
-                        @if($pedido->impuesto > 0)
-                            <div class="flex justify-between text-sm">
-                                <span class="text-gray-700">Impuesto:</span>
-                                <span class="font-medium">${{ number_format($pedido->impuesto, 2) }}</span>
-                            </div>
-                        @endif
                         <div class="flex justify-between text-base font-bold pt-2 border-t border-blue-200">
                             <span style="color: #1e40af;">TOTAL A COBRAR:</span>
                             <span style="color: #1e40af;">${{ number_format($pedido->total, 2) }}</span>

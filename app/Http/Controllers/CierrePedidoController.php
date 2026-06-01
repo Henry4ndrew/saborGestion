@@ -75,7 +75,6 @@ class CierrePedidoController extends Controller
 
         $resumen = [
             'subtotal' => $pedidos->sum('subtotal'),
-            'impuesto' => $pedidos->sum('impuesto'),
             'descuento' => $pedidos->sum('descuento'),
             'total' => $pedidos->sum('total'),
             'items' => $pedidos->sum(fn($p) => $p->detalles->sum('cantidad')),
