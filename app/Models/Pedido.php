@@ -179,7 +179,7 @@ class Pedido extends Model
     }
 
     /**
-     * Libera la mesa asociada al pedido si TODOS los pedidos de esa mesa están pagados.
+     * Libera la mesa asociada al pedido al confirmarse el pago.
      * Se llama automáticamente cuando se confirma el pago de una factura.
      *
      * @return bool true si la mesa fue liberada, false si no
@@ -196,16 +196,8 @@ class Pedido extends Model
             return false;
         }
 
-        // Obtener todos los pedidos de esta mesa
-        $pedidosDeMesa = self::where('mesa_id', $this->mesa_id)->get();
-
-        // Verificar si TODOS los pedidos tienen factura pagada
-        $todosPagados = $pedidosDeMesa->every(function (Pedido $pedido) {
-            return $pedido->factura && $pedido->factura->estado === Factura::ESTADO_PAGADA;
-        });
-
-        // Si todos están pagados, liberar la mesa
-        if ($todosPagados && $mesa->estado !== 'libre') {
+        // Si la mesa no está libre, ponerla en estado libre
+        if ($mesa->estado !== 'libre') {
             $estadoAnterior = $mesa->estado;
             $mesa->update(['estado' => 'libre']);
 
